@@ -1,0 +1,1331 @@
+"Phrases"
+{
+	//////////////////////
+	////////Menu//////////
+	//////////////////////
+	"MainTitle"
+	{
+		"ru"	"Админ панель"
+		"ua"	"Адмін панель"
+		"en"	"Admin panel"
+	}
+	"SelectTime"
+	{
+		"ru"	"Выберите время"
+		"ua"	"Оберіть час"
+		"en"	"Select time"
+	}
+	"SelectReason"
+	{
+		"ru"	"Выберите причину"
+		"ua"	"Оберіть причину"
+		"en"	"Select reason"
+	}
+	"SelectPlayer"
+	{
+		"ru"	"Выберите игрока"
+		"ua"	"Оберіть гравця"
+		"en"	"Select player"
+	}
+	"NoPlayers"
+	{
+		"ru"	"Нет доступных игроков"
+		"ua"	"Немає доступних гравців"
+		"en"	"No available players"
+	}
+	"Category_Punishments"
+	{
+		"ru"	"Управление наказаниями"
+		"ua"	"Керування покараннями"
+		"en"	"Punishments management"
+	}
+	"Item_PunishOfflinePlayer"
+	{
+		"ru"	"Наказать игрока(оффлайн)"
+		"ua"	"Покарати гравця(оффлайн)"
+		"en"	"Punish player(offline)"
+	}
+	"Item_UnPunishOfflinePlayer"
+	{
+		"ru"	"Снять наказание(оффлайн)"
+		"ua"	"Зняти покарання(офлайн)"
+		"en"	"Unpunish player(offline)"
+	}
+	"Item_PunishPlayer"
+	{
+		"ru"	"Наказать игрока"
+		"ua"	"Покарати гравця"
+		"en"	"Punish player"
+	}
+	"Item_UnPunishPlayer"
+	{
+		"ru"	"Снять наказание"
+		"ua"	"Зняти покарання"
+		"en"	"Unpunish player"
+	}
+	"SelectUnPunishType"
+	{
+		"ru"	"Выберите тип снятия наказания"
+		"ua"	"Оберіть тип зняття покарання"
+		"en"	"Select unpunish type"
+	}
+	"Item_BanPlayer"
+	{
+		"ru"	"Забанить игрока"
+		"ua"	"Забанити гравця"
+		"en"	"Ban player"
+	}
+	"Item_MutePlayer"
+	{
+		"ru"	"Заглушить войс"
+		"ua"	"Заглушити войс"
+		"en"	"Mute voice"
+	}
+	"Item_GagPlayer"
+	{
+		"ru"	"Заглушить чат"
+		"ua"	"Заглушити чат"
+		"en"	"Mute chat"
+	}
+	"Item_SilencePlayer"
+	{
+		"ru"	"Заглушить везде"
+		"ua"	"Заглушити всюди"
+		"en"	"Mute everywhere"
+	}
+	"Item_UnBanPlayer"
+	{
+		"ru"	"Разбанить игрока"
+		"ua"	"Розбанити гравця"
+		"en"	"Unban player"
+	}
+	"Item_UnMutePlayer"
+	{
+		"ru"	"Разглушить войс"
+		"ua"	"Розглушити войс"
+		"en"	"Unmute voice"
+	}
+	"Item_UnGagPlayer"
+	{
+		"ru"	"Разглушить чат"
+		"ua"	"Розглушити чат"
+		"en"	"Unmute chat"
+	}
+	"Item_UnSilencePlayer"
+	{
+		"ru"	"Разглушить везде"
+		"ua"	"Розглушити всюди"
+		"en"	"Unmute everywhere"
+	}
+	"SelectPunishType"
+	{
+		"ru"	"Выберите тип наказания"
+		"ua"	"Оберіть тип покарання"
+		"en"	"Select punishment type"
+	}
+	"SelectOfflinePlayer"
+	{
+		"ru"	"Выберите оффлайн игрока"
+		"ua"	"Оберіть оффлайн гравця"
+		"en"	"Select offline player"
+	}
+	//////////////////////
+	////////Center////////
+	//////////////////////
+	"MuteActiveCenter"
+	{
+		"ru"	"У вас есть активная блокировка голоса по причине: %s, истекает через: %s"
+		"ua"	"У вас є активна блокування голосу з причини: %s, закінчується через: %s"
+		"en"	"You have an active voice mute due to: %s, expires in: %s"
+	}
+	//////////////////////
+	////////Chat////////
+	//////////////////////
+	"MuteExpired"
+	{
+		"ru"	"Время мута истекло"
+		"ua"	"Час мута минув"
+		"en"	"Mute time has expired"
+	}
+	"MuteActiveChat"
+	{
+		"ru"	"У вас есть активная блокировка чата по причине: {LIGHTRED}%s{DEFAULT}\n Истекает через: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"У вас є активна блокування чату з причини: {LIGHTRED}%s{DEFAULT}\n Закінчується через: {LIGHTRED}%s{DEFAULT}"
+		"en"	"You have an active chat mute due to: {LIGHTRED}%s{DEFAULT}\n Expires in: {LIGHTRED}%s{DEFAULT}"
+	}
+	"Never"
+	{
+		"ru"	"Никогда"
+		"ua"	"Ніколи"
+		"en"	"Never"
+	}
+	"Expired"
+	{
+		"ru"	"Истеко"
+		"ua"	"Минуло"
+		"en"	"Expired"
+	}
+	"Days"
+	{
+		"ru"	" дн."
+		"ua"	" дн."
+		"en"	" days"
+	}
+	"Hours"
+	{
+		"ru"	" ч."
+		"ua"	" год."
+		"en"	" hours"
+	}
+	"Minutes"
+	{
+		"ru"	" мин."
+		"ua"	" хв."
+		"en"	" min."
+	}
+	"Seconds"
+	{
+		"ru"	" сек."
+		"ua"	" сек."
+		"en"	" sec."
+	}
+	"NewBanMessageAdmin"
+	{
+		"ru"	"Вы успешно заблокировали игрока {LIGHTRED}%s{DEFAULT} на срок {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Ви успішно заблокували гравця {LIGHTRED}%s{DEFAULT} на термін {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT}"
+		"en"	"You have successfully banned player {LIGHTRED}%s{DEFAULT} for {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewBanMessage"
+	{
+		"ru"	"Вас заблокировали на {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT} от администратора {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Вас заблокували на {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT} від адміністратора {LIGHTRED}%s{DEFAULT}"
+		"en"	"You have been banned on {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT} by admin {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewBanMessageAll"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} заблокировал игрока {LIGHTRED}%s{DEFAULT} на {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} заблокував гравця {LIGHTRED}%s{DEFAULT} на {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has banned player {LIGHTRED}%s{DEFAULT} on {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT}"
+	}
+	"UnbanMessageAll"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} разблокировал игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} розблокував гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has unbanned player {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewMuteMessageAdmin"
+	{
+		"ru"	"Вы успешно замутили игрока {LIGHTRED}%s{DEFAULT} на срок {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Ви успішно замутили гравця {LIGHTRED}%s{DEFAULT} на термін {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT}"
+		"en"	"You have successfully muted player {LIGHTRED}%s{DEFAULT} for {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewMuteMessage"
+	{
+		"ru"	"Вы получили блокировку войса на {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT} от администратора {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Ви отримали блокування войса на {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT} від адміністратора {LIGHTRED}%s{DEFAULT}"
+		"en"	"Your voice has been muted on {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT} by admin {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewMuteMessageAll"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} заблокировал войс игроку {LIGHTRED}%s{DEFAULT} на {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} заблокував войс гравцю {LIGHTRED}%s{DEFAULT} на {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has muted voice for player {LIGHTRED}%s{DEFAULT} on {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT}"
+	}
+	"UnmuteMessageAll"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} разблокировал войс игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} розблокував войс гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has unmuted voice for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewGagMessageAdmin"
+	{
+		"ru"	"Вы успешно заблокировали чат игроку {LIGHTRED}%s{DEFAULT} на срок {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Ви успішно заблокували чат гравцю {LIGHTRED}%s{DEFAULT} на термін {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT}"
+		"en"	"You have successfully muted chat for player {LIGHTRED}%s{DEFAULT} for {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewGagMessage"
+	{
+		"ru"	"Вам заблокировали чат на {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT} от администратора {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Вам заблокували чат на {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT} від адміністратора {LIGHTRED}%s{DEFAULT}"
+		"en"	"Your chat has been muted on {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT} by admin {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewGagMessageAll"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} заблокировал чат игроку {LIGHTRED}%s{DEFAULT} на {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} заблокував чат гравцю {LIGHTRED}%s{DEFAULT} на {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has muted chat for player {LIGHTRED}%s{DEFAULT} on {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT}"
+	}
+	"UngagMessageAll"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} разблокировал чат игроку {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} розблокував чат гравцю {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has unmuted chat for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewSilenceMessageAdmin"
+	{
+		"ru"	"Вы успешно заблокировали чат и голос игроку {LIGHTRED}%s{DEFAULT} на срок {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Ви успішно заблокували чат і голос гравцю {LIGHTRED}%s{DEFAULT} на термін {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT}"
+		"en"	"You have successfully muted chat and voice for player {LIGHTRED}%s{DEFAULT} for {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewSilenceMessage"
+	{
+		"ru"	"Вам заблокировали чат и голос на {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT} от администратора {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Вам заблокували чат і голос на {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT} від адміністратора {LIGHTRED}%s{DEFAULT}"
+		"en"	"Your chat and voice has been muted on {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT} by admin {LIGHTRED}%s{DEFAULT}"
+	}
+	"NewSilenceMessageAll"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} заблокировал чат и голос игроку {LIGHTRED}%s{DEFAULT} на {LIGHTRED}%s{DEFAULT} по причине: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} заблокував чат і голос гравцю {LIGHTRED}%s{DEFAULT} на {LIGHTRED}%s{DEFAULT} з причини: {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has muted chat and voice for player {LIGHTRED}%s{DEFAULT} on {LIGHTRED}%s{DEFAULT} due to: {LIGHTRED}%s{DEFAULT}"
+	}
+	"UnsilenceMessageAll"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} разблокировал чат и голос игроку {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} розблокував чат і голос гравцю {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has unmuted chat and voice for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminExpired"
+	{
+		"ru"	"Ваш админ статус истек"
+		"ua"	"Ваш адмін статус минув"
+		"en"	"Your admin status has expired"
+	}
+	"UnPunishOfflineSuccess"
+	{
+		"ru"	"Вы успешно сняли наказание с игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Ви успішно зняли покарання з гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"You have successfully unpunished player {LIGHTRED}%s{DEFAULT}"
+	}
+	"UnPunishSuccess"
+	{
+		"ru"	"Вы успешно сняли наказание с игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Ви успішно зняли покарання з гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"You have successfully unpunished player {LIGHTRED}%s{DEFAULT}"
+	}
+	"UsagePunish"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <time> <reason>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <time> <reason>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid> <time> <reason>"
+	}
+	"UsageUnPunish"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+	}
+	"NoPermission"
+	{
+		"ru"	"У вас нет прав для использования этой команды"
+		"ua"	"У вас немає прав для використання цієї команди"
+		"en"	"You don't have permission to use this command"
+	}
+	"PlayerNotFound"
+	{
+		"ru"	"Игрок не найден"
+		"ua"	"Гравець не знайдений"
+		"en"	"Player not found"
+	}
+	"PlayerPunished"
+	{
+		"ru"	"Вы успешно наказали игрока"
+		"ua"	"Ви успішно покарали гравця"
+		"en"	"You have successfully punished player"
+	}
+	"PlayerUnPunished"
+	{
+		"ru"	"Вы успешно сняли наказание с игрока"
+		"ua"	"Ви успішно зняли покарання з гравця"
+		"en"	"You have successfully unpunished player"
+	}
+	"UsageAddAdmin"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <group>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <group>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <group>"
+	}
+	"UsageRemoveAdmin"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+	}
+	"AdminRemoved"
+	{
+		"ru"	"Вы успешно удалили админа"
+		"ua"	"Ви успішно видалили адміна"
+		"en"	"You have successfully removed admin"
+	}
+	"AdminAdded"
+	{
+		"ru"	"Вы успешно добавили админа"
+		"ua"	"Ви успішно додали адміна"
+		"en"	"You have successfully added admin"
+	}
+	"Category_Server"
+	{
+		"ru"	"Управление сервером"
+		"ua"	"Керування сервером"
+		"en"	"Server management"
+	}
+	"Item_Maps"
+	{
+		"ru"	"Сменить карту"
+		"ua"	"Змінити карту"
+		"en"	"Change map"
+	}
+	"SelectMap"
+	{
+		"ru"	"Выберите карту"
+		"ua"	"Оберіть карту"
+		"en"	"Select map"
+	}
+	"Changing_Map"
+	{
+		"ru"	"Смена карты на {LIGHTRED}%s{DEFAULT}..."
+		"ua"	"Зміна карти на {LIGHTRED}%s{DEFAULT}..."
+		"en"	"Changing map to {LIGHTRED}%s{DEFAULT}..."
+	}
+	"Changing_Map_Admin"
+	{
+		"ru"	"Админ {LIGHTRED}%s{DEFAULT} сменил карту на {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адмін {LIGHTRED}%s{DEFAULT} змінив карту на {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has changed map to {LIGHTRED}%s{DEFAULT}"
+	}
+	"Category_Players"
+	{
+		"ru"	"Управление игроками"
+		"ua"	"Керування гравцями"
+		"en"	"Players management"
+	}
+	"Item_Kill"
+	{
+		"ru"	"Убить игрока"
+		"ua"	"Вбити гравця"
+		"en"	"Kill player"
+	}
+	"Item_Kick"
+	{
+		"ru"	"Кикнуть игрока"
+		"ua"	"Кікнути гравця"
+		"en"	"Kick player"
+	}
+	"Item_Who"
+	{
+		"ru"	"Опознать игрока"
+		"ua"	"Визначити гравця"
+		"en"	"Identify player"
+	}
+	"Item_Slap"
+	{
+		"ru"	"Шлепнуть игрока"
+		"ua"	"Пощипати гравця"
+		"en"	"Slap player"
+	}
+	"Item_Rename"
+	{
+		"ru"	"Переименовать игрока"
+		"ua"	"Перейменувати гравця"
+		"en"	"Rename player"
+	}
+	"Item_ChangeTeam"
+	{
+		"ru"	"Сменить команду игрока"
+		"ua"	"Змінити команду гравця"
+		"en"	"Change player's team"
+	}
+	"Item_SwitchTeam"
+	{
+		"ru"	"Переместить игрока"
+		"ua"	"Перемістити гравця"
+		"en"	"Switch player"
+	}
+	"Item_Noclip"
+	{
+		"ru"	"Ноуклип"
+		"ua"	"Ноукліп"
+		"en"	"Noclip"
+	}
+	"UsageRcon"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <command>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <command>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <command>"
+	}
+	"UsageChangeMap"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <map>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <map>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <map>"
+	}
+	"Item_Who_NoFlags"
+	{
+		"ru"	"Игрок не имеет никаких прав"
+		"ua"	"Гравець не має жодних прав"
+		"en"	"Player has no flags"
+	}
+	"Item_Who_Flags"
+	{
+		"ru"	"Игрок {LIGHTRED}%s{DEFAULT} имеет права:"
+		"ua"	"Гравець {LIGHTRED}%s{DEFAULT} має права:"
+		"en"	"Player {LIGHTRED}%s{DEFAULT} has flags:"
+	}
+	"Item_Slap_Damage"
+	{
+		"ru"	"Выберите количество урона"
+		"ua"	"Оберіть кількість урону"
+		"en"	"Select damage amount"
+	}
+	"SelectTeam"
+	{
+		"ru"	"Выберите команду"
+		"ua"	"Оберіть команду"
+		"en"	"Select team"
+	}
+	"AdminKillMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} убил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} вбив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has killed player {LIGHTRED}%s{DEFAULT}"
+	}
+	"KillMessage"
+	{
+		"ru"	"Администратор убил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор вбив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has killed player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminKickMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} кикнул игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} кікнув гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has kicked player {LIGHTRED}%s{DEFAULT}"
+	}
+	"KickMessage"
+	{
+		"ru"	"Администратор кикнул игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор кікнув гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has kicked player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminSlapMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} шлепнул игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} пощипав гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has slapped player {LIGHTRED}%s{DEFAULT}"
+	}
+	"SlapMessage"
+	{
+		"ru"	"Администратор шлепнул игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор пощипав гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has slapped player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminRenameMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} переименовал игрока {LIGHTRED}%s{DEFAULT} в {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} перейменував гравця {LIGHTRED}%s{DEFAULT} в {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has renamed player {LIGHTRED}%s{DEFAULT} to {LIGHTRED}%s{DEFAULT}"
+	}
+	"RenameMessage"
+	{
+		"ru"	"Администратор переименовал игрока {LIGHTRED}%s{DEFAULT} в {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор перейменував гравця {LIGHTRED}%s{DEFAULT} в {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has renamed player {LIGHTRED}%s{DEFAULT} to {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminChangeTeamMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} сменил команду игрока {LIGHTRED}%s{DEFAULT} за команду {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} змінив команду гравця {LIGHTRED}%s{DEFAULT} на команду {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has changed team for player {LIGHTRED}%s{DEFAULT} to team {LIGHTRED}%s{DEFAULT}"
+	}
+	"ChangeTeamMessage"
+	{
+		"ru"	"Администратор сменил команду игрока {LIGHTRED}%s{DEFAULT} за команду {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор змінив команду гравця {LIGHTRED}%s{DEFAULT} на команду {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has changed team for player {LIGHTRED}%s{DEFAULT} to team {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminSwitchTeamMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} переместил игрока {LIGHTRED}%s{DEFAULT} за команду {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} перемістив гравця {LIGHTRED}%s{DEFAULT} на команду {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has switched player {LIGHTRED}%s{DEFAULT} to team {LIGHTRED}%s{DEFAULT}"
+	}
+	"SwitchTeamMessage"
+	{
+		"ru"	"Администратор переместил игрока {LIGHTRED}%s{DEFAULT} за команду {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор перемістив гравця {LIGHTRED}%s{DEFAULT} на команду {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has switched player {LIGHTRED}%s{DEFAULT} to team {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminNoclipMessageEnable"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} включил ноуклип для игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} увімкнув ноукліп для гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has enabled noclip for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminNoclipMessageDisable"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} выключил ноуклип для игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} вимкнув ноукліп для гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has disabled noclip for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"NoclipMessageEnable"
+	{
+		"ru"	"Администратор включил ноуклип для игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор увімкнув ноукліп для гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has enabled noclip for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"NoclipMessageDisable"
+	{
+		"ru"	"Администратор выключил ноуклип для игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор вимкнув ноукліп для гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has disabled noclip for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"none"
+	{
+		"ru"	"нет"
+		"ua"	"немає"
+		"en"	"none"
+	}
+	"spectators"
+	{
+		"ru"	"наблюдатели"
+		"ua"	"спостерігачі"
+		"en"	"spectators"
+	}
+	"terrorists"
+	{
+		"ru"	"террористы"
+		"ua"	"терористи"
+		"en"	"terrorists"
+	}
+	"counter-terrorists"
+	{
+		"ru"	"контр-террористы"
+		"ua"	"контр-терористи"
+		"en"	"counter-terrorists"
+	}
+	"UsageDefault"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+	}
+	"UsageSwitchTeam"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <0-3>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <0-3>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <0-3>"
+	}
+	"UsageSlap"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <damage>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <damage>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <damage>"
+	}
+	"UsageRename"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <name>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <name>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <name>"
+	}
+	//Fun Commands
+	"Usage_Gravity"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <gravity>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <gravity>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <gravity>"
+	}
+	"Usage_HP"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <hp>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <hp>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <hp>"
+	}
+	"Usage_Armor"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <armor>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <armor>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <armor>"
+	}
+	"Usage_Scale"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <scale>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <scale>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <scale>"
+	}
+	"Usage_Speed"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <speed>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <speed>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <speed>"
+	}
+	"Usage_God"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <1/0>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <1/0>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <1/0>"
+	}
+	"Usage_Freeze"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <time>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <time>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <time>"
+	}
+	"Usage_Unfreeze"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+	}
+	"Usage_Blind"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <time>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <time>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <time>"
+	}
+	"Usage_Unblind"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+	}
+	"Usage_Bury"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+	}
+	"Usage_Unbury"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+	}
+	"AdminGravityMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} изменил гравитацию игрока {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} змінив гравітацію гравця {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has changed gravity for player {LIGHTRED}%s{DEFAULT} to %0.1fx"
+	}
+	"GravityMessage"
+	{
+		"ru"	"Администратор изменил гравитацию игрока {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"ua"	"Адміністратор змінив гравітацію гравця {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"en"	"Admin has changed gravity for player {LIGHTRED}%s{DEFAULT} to %0.1fx"
+	}
+	"AdminHPMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} изменил здоровье игрока {LIGHTRED}%s{DEFAULT} на %i"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} змінив здоров'я гравця {LIGHTRED}%s{DEFAULT} на %i"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has changed health for player {LIGHTRED}%s{DEFAULT} to %i"
+	}
+	"HPMessage"
+	{
+		"ru"	"Администратор изменил здоровье игрока {LIGHTRED}%s{DEFAULT} на %i"
+		"ua"	"Адміністратор змінив здоров'я гравця {LIGHTRED}%s{DEFAULT} на %i"
+		"en"	"Admin has changed health for player {LIGHTRED}%s{DEFAULT} to %i"
+	}
+	"AdminArmorMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} изменил броню игрока {LIGHTRED}%s{DEFAULT} на %i"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} змінив броню гравця {LIGHTRED}%s{DEFAULT} на %i"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has changed armor for player {LIGHTRED}%s{DEFAULT} to %i"
+	}
+	"ArmorMessage"
+	{
+		"ru"	"Администратор изменил броню игрока {LIGHTRED}%s{DEFAULT} на %i"
+		"ua"	"Адміністратор змінив броню гравця {LIGHTRED}%s{DEFAULT} на %i"
+		"en"	"Admin has changed armor for player {LIGHTRED}%s{DEFAULT} to %i"
+	}
+	"AdminScaleMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} изменил размер игрока {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} змінив розмір гравця {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has changed scale for player {LIGHTRED}%s{DEFAULT} to %0.1fx"
+	}
+	"ScaleMessage"
+	{
+		"ru"	"Администратор изменил размер игрока {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"ua"	"Адміністратор змінив розмір гравця {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"en"	"Admin has changed scale for player {LIGHTRED}%s{DEFAULT} to %0.1fx"
+	}
+	"AdminSpeedMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} изменил скорость игрока {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} змінив швидкість гравця {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has changed speed for player {LIGHTRED}%s{DEFAULT} to %0.1fx"
+	}
+	"SpeedMessage"
+	{
+		"ru"	"Администратор изменил скорость игрока {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"ua"	"Адміністратор змінив швидкість гравця {LIGHTRED}%s{DEFAULT} на %0.1fx"
+		"en"	"Admin has changed speed for player {LIGHTRED}%s{DEFAULT} to %0.1fx"
+	}
+	"AdminGodMessageEnable"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} включил бессмертие для игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} увімкнув бессмертя для гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has enabled godmode for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminGodMessageDisable"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} выключил бессмертие для игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} вимкнув бессмертя для гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has disabled godmode for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"GodMessageEnable"
+	{
+		"ru"	"Администратор включил бессмертие для игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор увімкнув бессмертя для гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has enabled godmode for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"GodMessageDisable"
+	{
+		"ru"	"Администратор выключил бессмертие для игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор вимкнув бессмертя для гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has disabled godmode for player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminFreezeMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} заморозил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} заморозив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has frozen player {LIGHTRED}%s{DEFAULT}"
+	}
+	"FreezeMessage"
+	{
+		"ru"	"Администратор заморозил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор заморозив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has frozen player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminUnfreezeMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} разморозил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} розморозив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has unfrozen player {LIGHTRED}%s{DEFAULT}"
+	}
+	"UnfreezeMessage"
+	{
+		"ru"	"Администратор разморозил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор розморозив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has unfrozen player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminBlindMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} ослепил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} осліпив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has blinded player {LIGHTRED}%s{DEFAULT}"
+	}
+	"BlindMessage"
+	{
+		"ru"	"Администратор ослепил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор осліпив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has blinded player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminUnblindMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} разослепил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} розосліпив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has unblinded player {LIGHTRED}%s{DEFAULT}"
+	}
+	"UnblindMessage"
+	{
+		"ru"	"Администратор разослепил игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор розосліпив гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has unblinded player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminBuryMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} закопал игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} поховав гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has buried player {LIGHTRED}%s{DEFAULT}"
+	}
+	"BuryMessage"
+	{
+		"ru"	"Администратор закопал игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор поховав гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has buried player {LIGHTRED}%s{DEFAULT}"
+	}
+	"AdminUnburyMessage"
+	{
+		"ru"	"Администратор {LIGHTRED}%s{DEFAULT} раскопал игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор {LIGHTRED}%s{DEFAULT} розкопав гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin {LIGHTRED}%s{DEFAULT} has unburied player {LIGHTRED}%s{DEFAULT}"
+	}
+	"UnburyMessage"
+	{
+		"ru"	"Администратор раскопал игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Адміністратор розкопав гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Admin has unburied player {LIGHTRED}%s{DEFAULT}"
+	}
+	"Item_Freeze"
+	{
+		"ru"	"Заморозить игрока"
+		"ua"	"Заморозити гравця"
+		"en"	"Freeze player"
+	}
+	"Item_Gravity"
+	{
+		"ru"	"Гравитация"
+		"ua"	"Гравітація"
+		"en"	"Gravity"
+	}	
+	"Item_HP"
+	{
+		"ru"	"Здоровье"
+		"ua"	"Здоров'я"
+		"en"	"Health"
+	}
+	"Item_Armor"
+	{
+		"ru"	"Броня"
+		"ua"	"Броня"
+		"en"	"Armor"
+	}
+	"Item_Scale"
+	{
+		"ru"	"Размер"
+		"ua"	"Розмір"
+		"en"	"Scale"
+	}
+	"Item_Speed"
+	{
+		"ru"	"Скорость"
+		"ua"	"Швидкість"
+		"en"	"Speed"
+	}
+	"Item_God"
+	{
+		"ru"	"Бессмертие"
+		"ua"	"Бессмертя"
+		"en"	"Godmode"
+	}
+	"Item_Bury"
+	{
+		"ru"	"Закопать игрока"
+		"ua"	"Поховати гравця"
+		"en"	"Bury player"
+	}
+	"Item_Unbury"
+	{
+		"ru"	"Раскопать игрока"
+		"ua"	"Розкопати гравця"
+		"en"	"Unbury player"
+	}
+	"Item_Blind"
+	{
+		"ru"	"Ослепить игрока"
+		"ua"	"Осліпити гравця"
+		"en"	"Blind player"
+	}
+
+	//Check Cheats
+	"Category_CheckCheats"
+	{
+		"ru"	"Проверка на читы"
+		"ua"	"Перевірка на чіти"
+		"en"	"Check for cheats"
+	}
+	"Item_CheckCheats"
+	{
+		"ru"	"Проверка на читы"
+		"ua"	"Перевірка на чіти"
+		"en"	"Check for cheats"
+	}
+	"CC_BlockChangeTeam"
+	{
+		"ru"	"Вы не можете менять команду во время проверки"
+		"ua"	"Ви не можете змінювати команду під час перевірки"
+		"en"	"You cannot change teams during the check"
+	}
+	"CC_Timer_Expired"
+	{
+		"ru"	"Таймер истёк"
+		"ua"	"Таймер закінчився"
+		"en"	"Timer expired"
+	}
+	"CC_Timer_Seconds"
+	{
+		"ru"	"Осталось %i секунд"
+		"ua"	"Залишилося %i секунд"
+		"en"	"%i seconds remaining"
+	}
+	"CC_Select_Social"
+	{
+		"ru"	"Во время проверки будет использоваться {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Під час перевірки буде використовуватися {LIGHTRED}%s{DEFAULT}"
+		"en"	"{LIGHTRED}%s{DEFAULT} will be used during the check"
+	}
+	"CC_Input_Contact"
+	{
+		"ru"	"Используйте {LIGHTRED}%s{DEFAULT} {LIGHTRED}%s{DEFAULT} для ввода своих данных"
+		"ua"	"Використовуйте {LIGHTRED}%s{DEFAULT} {LIGHTRED}%s{DEFAULT} для введення своїх даних"
+		"en"	"Use {LIGHTRED}%s{DEFAULT} {LIGHTRED}%s{DEFAULT} to enter your data"
+	}
+	"CC_Title_EndCheck"
+	{
+		"ru"	"Выберите причину"
+		"ua"	"Оберіть причину"
+		"en"	"Select reason"
+	}
+	"CC_Title_Main"
+	{
+		"ru"	"Проверка на читы"
+		"ua"	"Перевірка на чіти"
+		"en"	"Check for cheats"
+	}
+	"CC_End_Good"
+	{
+		"ru"	"Вы успешно прошли проверку, приятной игры"
+		"ua"	"Ви успішно пройшли перевірку, приємної гри"
+		"en"	"You have successfully passed the check, enjoy the game"
+	}
+	"CC_End_Good_Admin"
+	{
+		"ru"	"Игрок успешно прошёл проверку"
+		"ua"	"Гравець успішно пройшов перевірку"
+		"en"	"The player has successfully passed the check"
+	}
+	"CC_Notify_Socials"
+	{
+		"ru"	"Напомнить про выбор социальной сети"
+		"ua"	"Нагадати про вибір соціальної мережі"
+		"en"	"Remind to choose a social network"
+	}
+	"CC_Notify_Contact"
+	{
+		"ru"	"Напомнить про ввод данных"
+		"ua"	"Нагадати про введення даних"
+		"en"	"Remind to enter data"
+	}
+	"CC_Notify_Socials_Admin"
+	{
+		"ru"	"Вы успешно напомнили игроку про выбор социальной сети"
+		"ua"	"Ви успішно нагадали гравцю про вибір соціальної мережі"
+		"en"	"You have successfully reminded the player to choose a social network"
+	}
+	"CC_Notify_Contact_Admin"
+	{
+		"ru"	"Вы успешно напомнили игроку про ввод данных"
+		"ua"	"Ви успішно нагадали гравцю про введення даних"
+		"en"	"You have successfully reminded the player to enter data"
+	}
+	"CC_Notify_Socials_User"
+	{
+		"ru"	"Вам необходимо выбрать социальную сеть"
+		"ua"	"Вам необхідно вибрати соціальну мережу"
+		"en"	"You need to choose a social network"
+	}
+	"CC_Stage_Start"
+	{
+		"ru"	"Проверка начата"
+		"ua"	"Перевірка розпочата"
+		"en"	"Check started"
+	}
+	"CC_ChangeSpecItem"
+	{
+		"ru"	"Переместить за наблюдателей"
+		"ua"	"Перемістити до спостерігачів"
+		"en"	"Move to spectators"
+	}
+	"CC_BlockChangeTeam_Item"
+	{
+		"ru"	"Заблокировать смену команды"
+		"ua"	"Заблокувати зміну команди"
+		"en"	"Block team change"
+	}
+	"CC_EndCheck_Item"
+	{
+		"ru"	"Завершить проверку"
+		"ua"	"Завершити перевірку"
+		"en"	"End check"
+	}
+	"CC_Notify_Spec_Admin"
+	{
+		"ru"	"Вы успешно переместили игрока за наблюдателей"
+		"ua"	"Ви успішно перемістили гравця до спостерігачів"
+		"en"	"You have successfully moved the player to spectators"
+	}
+	"CC_Notify_Spec_User"
+	{
+		"ru"	"Вас переместили за наблюдателей"
+		"ua"	"Вас перемістили до спостерігачів"
+		"en"	"You have been moved to spectators"
+	}
+	"CC_Notify_Start_Admin"
+	{
+		"ru"	"Вы успешно начали проверку"
+		"ua"	"Ви успішно розпочали перевірку"
+		"en"	"You have successfully started the check"
+	}
+	"CC_Notify_Start_User"
+	{
+		"ru"	"Вас начали проверять на читы"
+		"ua"	"Вас почали перевіряти на чіти"
+		"en"	"You are being checked for cheats"
+	}
+	"CC_Notify_Block_Team_Admin"
+	{
+		"ru"	"Вы успешно заблокировали смену команды"
+		"ua"	"Ви успішно заблокували зміну команди"
+		"en"	"You have successfully blocked the team change"
+	}
+	"CC_Notify_Block_Team_User"
+	{
+		"ru"	"Вам заблокировали смену команды"
+		"ua"	"Вам заблокували зміну команди"
+		"en"	"Your team change has been blocked"
+	}
+	"CC_Notify_SpecAndBlock_Admin"
+	{
+		"ru"	"Игрок был успешно перемещён за наблюдателей и заблокирована смена команды"
+		"ua"	"Гравець був успішно переміщений до спостерігачів і заблокована зміна команди"
+		"en"	"The player has been successfully moved to spectators and the team change has been blocked"
+	}
+	"CC_Notify_SpecAndBlock_User"
+	{
+		"ru"	"Вас переместили за наблюдателей и заблокировали смену команды"
+		"ua"	"Вас перемістили до спостерігачів і заблокували зміну команди"
+		"en"	"You have been moved to spectators and your team change has been blocked"
+	}
+	"CC_Title_Socials"
+	{
+		"ru"	"Выберите соц.сеть"
+		"ua"	"Оберіть соц.мережу"
+		"en"	"Choose a social network"
+	}
+	"CC_SelectPlayer"
+	{
+		"ru"	"Выберите игрока"
+		"ua"	"Оберіть гравця"
+		"en"	"Select player"
+	}
+	"CC_NoPlayers"
+	{
+		"ru"	"Нет доступных игроков"
+		"ua"	"Немає доступних гравців"
+		"en"	"No available players"
+	}
+	"CC_Contact_Size"
+	{
+		"ru"	"Длина контакта должна быть от %d до %d символов"
+		"ua"	"Довжина контакту повинна бути від %d до %d символів"
+		"en"	"Contact length must be between %d and %d characters"
+	}
+	"CC_SetContact_User"
+	{
+		"ru"	"Вы ввели контактные данные ({LIGHTRED}%s{DEFAULT})"
+		"ua"	"Ви ввели контактні дані ({LIGHTRED}%s{DEFAULT})"
+		"en"	"You have entered contact details ({LIGHTRED}%s{DEFAULT})"
+	}
+	"CC_SetContact_Admin"
+	{
+		"ru"	"Игрок ввёл контактные данные: {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Гравець ввів контактні дані: {LIGHTRED}%s{DEFAULT}"
+		"en"	"The player has entered contact details: {LIGHTRED}%s{DEFAULT}"
+	}
+	"CC_Title_Leave"
+	{
+		"ru"	"Завершение проверки"
+		"ua"	"Завершення перевірки"
+		"en"	"End of check"
+	}
+	//HIDE
+	"Hide_Off"
+	{
+		"ru"	"Вы выключили режим невидимки"
+		"ua"	"Ви вимкнули режим невидимки"
+		"en"	"You have turned off the hide mode"
+	}
+	"Hide_On"
+	{
+		"ru"	"Вы включили режим невидимки"
+		"ua"	"Ви увімкнули режим невидимки"
+		"en"	"You have turned on the hide mode"
+	}
+	//VOTEBKM
+	"VoteBKM_Title"
+	{
+		"ru"	"Выберите действие"
+		"ua"	"Оберіть дію"
+		"en"	"Select action"
+	}
+	"VoteBKM_Title_Ban"
+	{
+		"ru"	"Бан игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Бан гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Ban player {LIGHTRED}%s{DEFAULT}"
+	}
+	"VoteBKM_Title_Kick"
+	{
+		"ru"	"Кик игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Кік гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Kick player {LIGHTRED}%s{DEFAULT}"
+	}
+	"VoteBKM_Title_Mute"
+	{
+		"ru"	"Блокировка голоса игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Блокування голосу гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Mute player {LIGHTRED}%s{DEFAULT}"
+	}
+	"VoteBKM_Title_Gag"
+	{
+		"ru"	"Запрет чата игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Заборона чату гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Gag player {LIGHTRED}%s{DEFAULT}"
+	}
+	"VoteBKM_Yes"
+	{
+		"ru"	"Проголосовать за"
+		"ua"	"Проголосувати за"
+		"en"	"Vote for"
+	}
+	"VoteBKM_No"
+	{
+		"ru"	"Проголосовать против"
+		"ua"	"Проголосувати проти"
+		"en"	"Vote against"
+	}
+	"VoteBKM_Ban"
+	{
+		"ru"	"Забанить"
+		"ua"	"Забанити"
+		"en"	"Ban"
+	}
+	"VoteBKM_Kick"
+	{
+		"ru"	"Кикнуть"
+		"ua"	"Кікнути"
+		"en"	"Kick"
+	}
+	"VoteBKM_Mute"
+	{
+		"ru"	"Блокировать голоса"
+		"ua"	"Блокувати голоси"
+		"en" 	"Mute"
+	}
+	"VoteBKM_Gag"
+	{
+		"ru"	"Запретить чат"
+		"ua"	"Заборонити чат"
+		"en"	"Gag"
+	}
+	"VoteBKM_NotEnoughPlayers"
+	{
+		"ru"	"Недостаточно игроков для голосования"
+		"ua"	"Недостатньо гравців для голосування"
+		"en"	"Not enough players to vote"
+	}
+	"VoteBKM_Admin"
+	{
+		"ru"	"Доступ закрыт т.к на сервере есть администратор"
+		"ua"	"Доступ закрито оскільки на сервері є адміністратор"
+		"en"	"Access denied because there is an administrator on the server"
+	}
+	"VoteBKM_CoolDown"
+	{
+		"ru"	"Недавно было проведено голосование, подождите %i секунд"
+		"ua"	"Нещодавно було проведено голосування, зачекайте %i секунд"
+		"en"	"A vote was recently held, wait %i seconds"
+	}
+	"VoteBKM_NoPlayers"
+	{
+		"ru"	"Нет доступных игроков для голосования"
+		"ua"	"Немає доступних гравців для голосування"
+		"en"	"No available players to vote"
+	}
+	"VoteBKM_SelectPlayer"
+	{
+		"ru"	"Выберите игрока"
+		"ua"	"Оберіть гравця"
+		"en"	"Select player"
+	}
+	"VoteBKM_Action_Ban"
+	{
+		"ru"	"Игрок {LIGHTRED}%s{DEFAULT} проголосовал за бан игрока {LIGHTRED}%s{DEFAULT} (%i/%i)"
+		"ua"	"Гравець {LIGHTRED}%s{DEFAULT} проголосував за бан гравця {LIGHTRED}%s{DEFAULT} (%i/%i)"
+		"en"	"Player {LIGHTRED}%s{DEFAULT} voted for ban player {LIGHTRED}%s{DEFAULT} (%i/%i)"
+	}
+	"VoteBKM_Action_Kick"
+	{
+		"ru"	"Игрок {LIGHTRED}%s{DEFAULT} проголосовал за кик игрока {LIGHTRED}%s{DEFAULT} (%i/%i)"
+		"ua"	"Гравець {LIGHTRED}%s{DEFAULT} проголосував за кік гравця {LIGHTRED}%s{DEFAULT} (%i/%i)"
+		"en"	"Player {LIGHTRED}%s{DEFAULT} voted for kick player {LIGHTRED}%s{DEFAULT} (%i/%i)"
+	}
+	"VoteBKM_Action_Mute"
+	{
+		"ru"	"Игрок {LIGHTRED}%s{DEFAULT} проголосовал за блокировку голоса игрока {LIGHTRED}%s{DEFAULT} (%i/%i)"
+		"ua"	"Гравець {LIGHTRED}%s{DEFAULT} проголосував за блокування голосу гравця {LIGHTRED}%s{DEFAULT} (%i/%i)"
+		"en"	"Player {LIGHTRED}%s{DEFAULT} voted for mute player {LIGHTRED}%s{DEFAULT} (%i/%i)"
+	}
+	"VoteBKM_Action_Gag"
+	{
+		"ru"	"Игрок {LIGHTRED}%s{DEFAULT} проголосовал за запрет чата игрока {LIGHTRED}%s{DEFAULT} (%i/%i)"
+		"ua"	"Гравець {LIGHTRED}%s{DEFAULT} проголосував за заборону чату гравця {LIGHTRED}%s{DEFAULT} (%i/%i)"
+		"en"	"Player {LIGHTRED}%s{DEFAULT} voted for gag player {LIGHTRED}%s{DEFAULT} (%i/%i)"
+	}
+	"VoteBKM_Created_Ban_Admin"
+	{
+		"ru"	"{LIGHTRED}%s{DEFAULT} создал голосование за бан игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"{LIGHTRED}%s{DEFAULT} створив голосування за бан гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"{LIGHTRED}%s{DEFAULT} created a vote to ban player {LIGHTRED}%s{DEFAULT}"
+	}
+	"VoteBKM_Created_Kick_Admin"
+	{
+		"ru"	"{LIGHTRED}%s{DEFAULT} создал голосование за кик игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"{LIGHTRED}%s{DEFAULT} створив голосування за кік гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"{LIGHTRED}%s{DEFAULT} created a vote to kick player {LIGHTRED}%s{DEFAULT}"
+	}
+	"VoteBKM_Created_Mute_Admin"
+	{
+		"ru"	"{LIGHTRED}%s{DEFAULT} создал голосование за блокировку голоса игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"{LIGHTRED}%s{DEFAULT} створив голосування за блокування голосу гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"{LIGHTRED}%s{DEFAULT} created a vote to mute player {LIGHTRED}%s{DEFAULT}"
+	}
+	"VoteBKM_Created_Gag_Admin"
+	{
+		"ru"	"{LIGHTRED}%s{DEFAULT} создал голосование за запрет чата игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"{LIGHTRED}%s{DEFAULT} створив голосування за заборону чату гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"{LIGHTRED}%s{DEFAULT} created a vote to gag player {LIGHTRED}%s{DEFAULT}"
+	}
+	"VoteBKM_Created_Ban"
+	{
+		"ru"	"Создано голосование за бан игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Створено голосування за бан гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Vote to ban player {LIGHTRED}%s{DEFAULT} has been created"
+	}
+	"VoteBKM_Created_Kick"
+	{
+		"ru"	"Создано голосование за кик игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Створено голосування за кік гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Vote to kick player {LIGHTRED}%s{DEFAULT} has been created"
+	}
+	"VoteBKM_Created_Mute"
+	{
+		"ru"	"Создано голосование за блокировку голоса игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Створено голосування за блокування голосу гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Vote to mute player {LIGHTRED}%s{DEFAULT} has been created"
+	}
+	"VoteBKM_Created_Gag"
+	{
+		"ru"	"Создано голосование за запрет чата игрока {LIGHTRED}%s{DEFAULT}"
+		"ua"	"Створено голосування за заборону чату гравця {LIGHTRED}%s{DEFAULT}"
+		"en"	"Vote to gag player {LIGHTRED}%s{DEFAULT} has been created"
+	}
+	"VoteBKM_Canceled"
+	{
+		"ru"	"Голосование провалено из-за нехватки голосов"
+		"ua"	"Голосування провалено через нестачу голосів"
+		"en"	"Vote failed due to lack of votes"
+	}
+	"VoteBKM_AlreadyActive"
+	{
+		"ru"	"Голосование уже запущено"
+		"ua"	"Голосування вже запущено"
+		"en"	"Vote is already active"
+	}
+	"VoteBKM_Success"
+	{
+		"ru"	"Голосование завершено. Игрок {LIGHTRED}%s{DEFAULT} наказан"
+		"ua"	"Голосування завершено. Гравець {LIGHTRED}%s{DEFAULT} покараний"
+		"en"	"Vote completed. Player {LIGHTRED}%s{DEFAULT} punished"
+	}
+}
