@@ -16,8 +16,6 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-20.04
-    outputs:
-      buildnumber: ${{ steps.buildnumber.outputs.build_number }}
 
     env:
       HL2SDK_ROOT: "${{ github.workspace }}/external"
@@ -25,13 +23,6 @@ jobs:
       MANIFEST_PATH: "${{ github.workspace }}/external/metamod-source/hl2sdk-manifests"
 
     steps:
-      - name: Generate build number
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        id: buildnumber
-        uses: onyxmueller/build-tag-number@v1
-        with:
-          token: ${{secrets.github_token}}
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -94,24 +85,9 @@ jobs:
       - name: Find downloaded artifact
         id: find_artifact
         run: echo "ARTIFACT=$(ls | grep '\.zip$')" >> $GITHUB_ENV
-
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Get commit message
-        id: get_commit_message
-        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
-
-      - name: Create tag
-        id: create_tag
-        run: |
-          TAG_NAME=$(echo ${{ env.COMMIT_MESSAGE }} | tr -d '[:space:]')
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
-          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
   
       - name: Upload release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.TAG_NAME }}
+          tag_name: ${{ github.event.head_commit.message }}
           files: ${{ env.ARTIFACT }}
