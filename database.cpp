@@ -57,7 +57,8 @@ void CreateConnection()
                                         id INT PRIMARY KEY AUTO_INCREMENT,\
                                         name VARCHAR(256),\
                                         flags VARCHAR(64),\
-                                        immunity INT\
+                                        immunity INT,\
+                                        UNIQUE (name)\
                                     );", g_szDatabasePrefix);
             txn.queries.push_back(szQuery);
 
@@ -65,13 +66,20 @@ void CreateConnection()
                                         id INT PRIMARY KEY AUTO_INCREMENT,\
                                         name VARCHAR(256),\
                                         steamid VARCHAR(32),\
-                                        flags VARCHAR(64),\
-                                        immunity INT,\
+                                        comment VARCHAR(256) DEFAULT NULL\
+                                    );", g_szDatabasePrefix, g_szDatabasePrefix);
+            txn.queries.push_back(szQuery);
+
+            g_SMAPI->Format(szQuery, sizeof(szQuery), "CREATE TABLE IF NOT EXISTS %sadmins_servers (\
+                                        id INT PRIMARY KEY AUTO_INCREMENT,\
+                                        admin_id INT,\
+                                        flags VARCHAR(64) DEFAULT NULL,\
+                                        immunity INT DEFAULT 0,\
                                         expires INT DEFAULT 0,\
                                         group_id INT DEFAULT NULL,\
                                         server_id INT,\
-                                        comment VARCHAR(256) DEFAULT NULL\
-                                    );", g_szDatabasePrefix, g_szDatabasePrefix);
+                                        UNIQUE (admin_id, server_id)\
+                                    );", g_szDatabasePrefix);
             txn.queries.push_back(szQuery);
 
             g_SMAPI->Format(szQuery, sizeof(szQuery), "CREATE TABLE IF NOT EXISTS %spunishments (\
@@ -97,7 +105,7 @@ void CreateConnection()
                 ISQLResult *result = query->GetResultSet();
                 if (result->GetRowCount() == 0) {
                     char szQuery[256];
-                    g_SMAPI->Format(szQuery, sizeof(szQuery), "INSERT INTO %sadmins (id, name, steamid, flags, immunity, server_id) VALUES (1, 'Console', '0', 'z', 100, -1)", g_szDatabasePrefix);
+                    g_SMAPI->Format(szQuery, sizeof(szQuery), "INSERT INTO %sadmins (id, name, steamid) VALUES (1, 'Console', '0')", g_szDatabasePrefix);
                     g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
                 }
             });
@@ -151,68 +159,54 @@ void CheckPunishments(int iSlot, uint64 xuid)
 
 void CheckPermissions(int iSlot, uint64 xuid)
 {
-    char szQuery[256];
-    g_SMAPI->Format(szQuery, sizeof(szQuery), 
-        "SELECT * FROM %sadmins WHERE steamid = '%llu'",
-        g_szDatabasePrefix,
-        xuid
-    );
+    g_pAdmins[iSlot].iID = 0;
+    g_pAdmins[iSlot].iImmunity = 0;
+    g_pAdmins[iSlot].iExpireTime = -1;
+    g_pAdmins[iSlot].vFlags.clear();
+    g_pAdmins[iSlot].vPermissions.clear();
 
+    char szQuery[512];
+    char szServerID[32];
+    g_SMAPI->Format(szServerID, sizeof(szServerID), " AND s.server_id = %d", g_iServerID[SID_ADMIN]);
+    g_SMAPI->Format(szQuery, sizeof(szQuery),
+        "SELECT a.id, a.name, s.flags, s.immunity, s.expires, s.group_id, g.name AS group_name, g.flags AS group_flags, g.immunity AS group_immunity FROM %sadmins a LEFT JOIN %sadmins_servers s ON a.id = s.admin_id LEFT JOIN %sgroups g ON s.group_id = g.id WHERE a.steamid = '%llu'%s",
+        g_szDatabasePrefix,
+        g_szDatabasePrefix,
+        g_szDatabasePrefix,
+        xuid,
+        g_iServerID[SID_ADMIN] == -1 ? "" : szServerID
+    );
     g_pConnection->Query(szQuery, [iSlot](ISQLQuery* query) {
         ISQLResult *result = query->GetResultSet();
         if (result->GetRowCount() > 0) {
+            Admin hAdmin;
+            hAdmin.iExpireTime = -1;
             while (result->FetchRow()) {
-                const char* szServerID = result->GetString(7);
-                if(atoi(szServerID) != g_iServerID[SID_ADMIN] && g_iServerID[SID_ADMIN] != -1) break;
-                
-                Admin hAdmin;
                 hAdmin.iID = result->GetInt(0);
                 hAdmin.szName = result->GetString(1);
-                hAdmin.iImmunity = result->GetInt(4);
-                hAdmin.iExpireTime = result->GetInt(5);
-                std::string sFlags = result->GetString(3);
-                for (size_t i = 0; i < sFlags.size(); i++) {
-                    std::vector<std::string> vPermissions = g_pAdminApi->GetPermissionsByFlag(sFlags.substr(i, 1).c_str());
+                int iImmunity = result->GetInt(3);
+                int iGroupImmunity = result->IsNull(8) ? 0 : result->GetInt(8);
+                if(iGroupImmunity > iImmunity) iImmunity = iGroupImmunity;
+                if(iImmunity > hAdmin.iImmunity) hAdmin.iImmunity = iImmunity;
+                int iExpires = result->GetInt(4);
+                if((iExpires > hAdmin.iExpireTime || iExpires == 0) && hAdmin.iExpireTime != 0) hAdmin.iExpireTime = iExpires;
+                const char* szFlags = result->GetString(2);
+                for (size_t i = 0; i < strlen(szFlags); i++) {
+                    std::vector<std::string> vPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szFlags[i]).c_str());
                     hAdmin.vPermissions.insert(hAdmin.vPermissions.end(), vPermissions.begin(), vPermissions.end());
-                    hAdmin.vFlags.push_back(sFlags.substr(i, 1));
+                    hAdmin.vFlags.push_back(std::string(1, szFlags[i]));
                 }
-
-                if (!result->IsNull(6)) {
-                    int groupID = result->GetInt(6);
-                    if(groupID == 0) continue;
-                    char szGroupQuery[256];
-                    g_SMAPI->Format(szGroupQuery, sizeof(szGroupQuery), 
-                        "SELECT * FROM %sgroups WHERE id = %d",
-                        g_szDatabasePrefix,
-                        groupID
-                    );
-
-                    g_pConnection->Query(szGroupQuery, [iSlot, &hAdmin](ISQLQuery* groupQuery) {
-                        ISQLResult *groupResult = groupQuery->GetResultSet();
-                        if (groupResult->GetRowCount() > 0) {
-                            while (groupResult->FetchRow()) {
-                                std::string groupFlags = groupResult->GetString(2);
-                                for (size_t i = 0; i < groupFlags.size(); i++) {
-                                    std::vector<std::string> vGroupPermissions = g_pAdminApi->GetPermissionsByFlag(groupFlags.substr(i, 1).c_str());
-                                    hAdmin.vPermissions.insert(hAdmin.vPermissions.end(), vGroupPermissions.begin(), vGroupPermissions.end());
-                                    hAdmin.vFlags.push_back(groupFlags.substr(i, 1));
-                                }
-
-                                int groupImmunity = groupResult->GetInt(3);
-                                if (groupImmunity > hAdmin.iImmunity) {
-                                    hAdmin.iImmunity = groupImmunity;
-                                }
-                            }
-                        }
-                        g_pAdmins[iSlot] = hAdmin;
-                        g_pAdminApi->OnAdminConnectedSend(iSlot);
-                    });
-                } else {
-                    g_pAdmins[iSlot] = hAdmin;
-                    g_pAdminApi->OnAdminConnectedSend(iSlot);
+                if(!result->IsNull(5) && result->GetInt(5) != 0) {
+                    const char* szGroupFlags = result->GetString(7);
+                    for (size_t i = 0; i < strlen(szGroupFlags); i++) {
+                        std::vector<std::string> vGroupPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szGroupFlags[i]).c_str());
+                        hAdmin.vPermissions.insert(hAdmin.vPermissions.end(), vGroupPermissions.begin(), vGroupPermissions.end());
+                        hAdmin.vFlags.push_back(std::string(1, szGroupFlags[i]));
+                    }
                 }
-                break;
             }
+            g_pAdminApi->OnAdminConnectedSend(iSlot);
+            g_pAdmins[iSlot] = hAdmin;
         }
     });
 }
@@ -292,7 +286,8 @@ void RemovePunishment(int iSlot, int iType, int iAdminID)
         iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID,
         g_pPlayers->GetSteamID64(iSlot),
         iType,
-        std::time(0)
+        std::time(0),
+        g_iServerID[SID_PUNISH]
     );
     g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
     g_iPunishments[iSlot][iType] = -1;
@@ -312,7 +307,8 @@ void RemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID)
         szSteamID64,
         iType,
         std::time(0),
-        g_iUnpunishType == 0 ? szAdminID : ""
+        g_iUnpunishType == 0 && iAdminID != -1? szAdminID : "",
+        g_iServerID[SID_PUNISH]
     );
 
     g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
@@ -321,123 +317,128 @@ void RemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID)
 
 void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, int iImmunity, int iExpireTime, int iGroupID, const char* szComment, bool bDB)
 {
-    if(bDB)
-    {
-        char szQuery[256];
-        if(iGroupID)
-        {
-            g_SMAPI->Format(szQuery, sizeof(szQuery), 
-                "INSERT INTO %sadmins (name, steamid, flags, immunity, expires, group_id, server_id, comment) VALUES ('%s', '%s', '%s', %d, %d, %d, %d, '%s')",
-                g_szDatabasePrefix,
-                szName,
-                szSteamID64,
-                szFlags,
-                iImmunity,
-                iExpireTime == 0 ? 0 : std::time(0) + iExpireTime,
-                iGroupID,
-                g_iServerID[SID_ADMIN],
-                szComment
-            );
-        }
-        else
-        {
-            g_SMAPI->Format(szQuery, sizeof(szQuery), 
-                "INSERT INTO %sadmins (name, steamid, flags, immunity, expires, server_id, comment) VALUES ('%s', '%s', '%s', %d, %d, %d, '%s')",
-                g_szDatabasePrefix,
-                szName,
-                szSteamID64,
-                szFlags,
-                iImmunity,
-                iExpireTime == 0 ? 0 : std::time(0) + iExpireTime,
-                g_iServerID[SID_ADMIN],
-                szComment
-            );
-        }
-        g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
-    }
-
+    const char* szSteamID = strdup(szSteamID64);
     bool bFound = false;
     int iSlot = -1;
     for(int i = 0; i < 64; i++)
     {
         CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
         if(!pPlayer) continue;
-        if(g_pPlayers->GetSteamID64(i) == std::stoull(szSteamID64))
+        if(g_pPlayers->GetSteamID64(i) == std::stoull(szSteamID))
         {
             bFound = true;
             iSlot = i;
         }
     }
 
-    if(bFound)
+    if(bFound && g_pAdmins[iSlot].iID != 0) return;
+
+    if(bDB) 
     {
-        g_pAdmins[iSlot].szName = szName;
+        char szQuery[512];
+        g_SMAPI->Format(szQuery, sizeof(szQuery), 
+            "SELECT id FROM %sadmins WHERE steamid = '%s'",
+            g_szDatabasePrefix,
+            szSteamID
+        );
+        g_pConnection->Query(szQuery, [iSlot, szName, szSteamID, szFlags, iImmunity, iExpireTime, iGroupID, szComment](ISQLQuery* query) {
+            ISQLResult *result = query->GetResultSet();
+            if (result->GetRowCount() > 0) {
+                result->FetchRow();
+                int iAdminID = result->GetInt(0);
+                char szQuery[512];
+                g_SMAPI->Format(szQuery, sizeof(szQuery), 
+                    "INSERT IGNORE INTO %sadmins_servers (admin_id, flags, immunity, expires, group_id, server_id) VALUES (%d, '%s', %d, %d, %d, %d)",
+                    g_szDatabasePrefix,
+                    iAdminID,
+                    szFlags,
+                    iImmunity,
+                    iExpireTime == 0 ? 0 : std::time(0) + iExpireTime,
+                    iGroupID,
+                    g_iServerID[SID_ADMIN]
+                );
+                g_pConnection->Query(szQuery, [iSlot, szSteamID](ISQLQuery* query) {
+                    if(iSlot != -1) CheckPermissions(iSlot, std::stoull(szSteamID));
+                });
+            } else {
+                char szQuery[512];
+                g_SMAPI->Format(szQuery, sizeof(szQuery), 
+                    "INSERT INTO %sadmins (name, steamid, comment) VALUES ('%s', '%s', '%s')",
+                    g_szDatabasePrefix,
+                    szName,
+                    szSteamID,
+                    szComment
+                );
+                g_pConnection->Query(szQuery, [iSlot, szSteamID, szFlags, iImmunity, iExpireTime, iGroupID](ISQLQuery* query) {
+                    char szQuery[512];
+                    g_SMAPI->Format(szQuery, sizeof(szQuery), 
+                        "SELECT id FROM %sadmins WHERE steamid = '%s'",
+                        g_szDatabasePrefix,
+                        szSteamID
+                    );
+                    g_pConnection->Query(szQuery, [iSlot, szSteamID, szFlags, iImmunity, iExpireTime, iGroupID](ISQLQuery* query) {
+                        ISQLResult *result = query->GetResultSet();
+                        if (result->GetRowCount() > 0) {
+                            result->FetchRow();
+                            int iAdminID = result->GetInt(0);
+                            char szQuery[512];
+                            g_SMAPI->Format(szQuery, sizeof(szQuery), 
+                                "INSERT IGNORE INTO %sadmins_servers (admin_id, flags, immunity, expires, group_id, server_id) VALUES (%d, '%s', %d, %d, %d, %d)",
+                                g_szDatabasePrefix,
+                                iAdminID,
+                                szFlags,
+                                iImmunity,
+                                iExpireTime == 0 ? 0 : std::time(0) + iExpireTime,
+                                iGroupID,
+                                g_iServerID[SID_ADMIN]
+                            );
+                            g_pConnection->Query(szQuery, [iSlot, szSteamID](ISQLQuery* query) {
+                                if(iSlot != -1) CheckPermissions(iSlot, std::stoull(szSteamID));
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    }
+
+    if(bFound && !bDB)
+    {
+        Admin hAdmin;
+        hAdmin.iID = 1;
+        hAdmin.szName = szName;
+        hAdmin.iImmunity = iImmunity;
+        hAdmin.iExpireTime = iExpireTime;
+        for (size_t i = 0; i < strlen(szFlags); i++) {
+            std::vector<std::string> vPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szFlags[i]).c_str());
+            hAdmin.vPermissions.insert(hAdmin.vPermissions.end(), vPermissions.begin(), vPermissions.end());
+            hAdmin.vFlags.push_back(std::string(1, szFlags[i]));
+        }
+        g_pAdmins[iSlot] = hAdmin;
         if(iGroupID != 0)
         {
-            char szGroupQuery[256];
-            g_SMAPI->Format(szGroupQuery, sizeof(szGroupQuery), 
+            char szQuery[512];
+            g_SMAPI->Format(szQuery, sizeof(szQuery), 
                 "SELECT * FROM %sgroups WHERE id = %d",
                 g_szDatabasePrefix,
                 iGroupID
             );
-        
-            g_pConnection->Query(szGroupQuery, [szName, szSteamID64, szFlags, iImmunity, iExpireTime, iSlot, bDB](ISQLQuery* groupQuery) {
-                ISQLResult *groupResult = groupQuery->GetResultSet();
-                if (groupResult->GetRowCount() > 0) {
-                    while (groupResult->FetchRow()) {
-                        std::string groupFlags = groupResult->GetString(2);
-                        for (size_t i = 0; i < groupFlags.size(); i++) {
-                            std::vector<std::string> vGroupPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, groupFlags[i]).c_str());
-                            g_pAdmins[iSlot].vPermissions.insert(g_pAdmins[iSlot].vPermissions.end(), vGroupPermissions.begin(), vGroupPermissions.end());
-                            g_pAdmins[iSlot].vFlags.push_back(std::string(1, groupFlags[i]));
-                        }
-        
-                        int groupImmunity = groupResult->GetInt(3);
-                        if (groupImmunity > g_pAdmins[iSlot].iImmunity) {
-                            g_pAdmins[iSlot].iImmunity = groupImmunity;
-                        }
-        
-                        for (size_t i = 0; i < strlen(szFlags); i++) {
-                            std::vector<std::string> vPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szFlags[i]).c_str());
-                            g_pAdmins[iSlot].vPermissions.insert(g_pAdmins[iSlot].vPermissions.end(), vPermissions.begin(), vPermissions.end());
-                            g_pAdmins[iSlot].vFlags.push_back(std::string(1, szFlags[i]));
-                        }
-        
-                        if(iImmunity > g_pAdmins[iSlot].iImmunity) {
-                            g_pAdmins[iSlot].iImmunity = iImmunity;
-                        }
-        
-                        g_pAdmins[iSlot].iExpireTime = iExpireTime == 0 ? 0 : std::time(0) + iExpireTime;
-        
-                        if(!bDB) g_pAdmins[iSlot].iID = 1;
+            g_pConnection->Query(szQuery, [iSlot](ISQLQuery* query) {
+                ISQLResult *result = query->GetResultSet();
+                if (result->GetRowCount() > 0) {
+                    result->FetchRow();
+                    int iImmunity = result->GetInt(3);
+                    if(iImmunity > g_pAdmins[iSlot].iImmunity) g_pAdmins[iSlot].iImmunity = iImmunity;
+                    const char* szFlags = result->GetString(2);
+                    for (size_t i = 0; i < strlen(szFlags); i++) {
+                        std::vector<std::string> vPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szFlags[i]).c_str());
+                        g_pAdmins[iSlot].vPermissions.insert(g_pAdmins[iSlot].vPermissions.end(), vPermissions.begin(), vPermissions.end());
+                        g_pAdmins[iSlot].vFlags.push_back(std::string(1, szFlags[i]));
                     }
                 }
             });
         }
-        else
-        {
-            for (size_t i = 0; i < strlen(szFlags); i++) {
-                std::vector<std::string> vPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szFlags[i]).c_str());
-                g_pAdmins[iSlot].vPermissions.insert(g_pAdmins[iSlot].vPermissions.end(), vPermissions.begin(), vPermissions.end());
-                g_pAdmins[iSlot].vFlags.push_back(std::string(1, szFlags[i]));
-            }
-            if(iImmunity > g_pAdmins[iSlot].iImmunity) {
-                g_pAdmins[iSlot].iImmunity = iImmunity;
-            }
-            g_pAdmins[iSlot].iExpireTime = iExpireTime == 0 ? 0 : std::time(0) + iExpireTime;
-            if(!bDB) g_pAdmins[iSlot].iID = 1;
-            g_pAdminApi->OnAdminConnectedSend(iSlot);
-        }
-        char szQuery[256];
-        g_SMAPI->Format(szQuery, sizeof(szQuery), "SELECT id FROM %sadmins WHERE steamid = '%s'", g_szDatabasePrefix, szSteamID64);
-        g_pConnection->Query(szQuery, [iSlot](ISQLQuery* query) {
-            ISQLResult *result = query->GetResultSet();
-            if (result->GetRowCount() > 0) {
-                if (result->FetchRow()) {
-                    g_pAdmins[iSlot].iID = result->GetInt(0);
-                }
-            }
-        });
+        g_pAdminApi->OnAdminConnectedSend(iSlot);
     }
 }
 
@@ -445,13 +446,37 @@ void RemoveAdmin(const char* szSteamID64, bool bDB)
 {
     if(bDB)
     {
-        char szQuery[256];
+        const char* szSteamID = strdup(szSteamID64);
+        char szQuery[512];
+        char szServerID[32];
+        g_SMAPI->Format(szServerID, sizeof(szServerID), " AND server_id = %d", g_iServerID[SID_ADMIN]);
         g_SMAPI->Format(szQuery, sizeof(szQuery), 
-            "DELETE FROM %sadmins WHERE steamid = '%s' AND server_id = %d",
+            "DELETE FROM %sadmins_servers WHERE admin_id = (SELECT id FROM %sadmins WHERE steamid = '%s')%s",
             g_szDatabasePrefix,
-            szSteamID64,
-            g_iServerID[SID_ADMIN]);
+            g_szDatabasePrefix,
+            szSteamID,
+            g_iServerID[SID_ADMIN] == -1 ? "" : szServerID
+        );
         g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
+
+        g_SMAPI->Format(szQuery, sizeof(szQuery), 
+            "SELECT * FROM %sadmins_servers WHERE admin_id = (SELECT id FROM %sadmins WHERE steamid = '%s')",
+            g_szDatabasePrefix,
+            g_szDatabasePrefix,
+            szSteamID
+        );
+        g_pConnection->Query(szQuery, [szSteamID](ISQLQuery* query) {
+            ISQLResult *result = query->GetResultSet();
+            if (result->GetRowCount() == 0) {
+                char szQuery[512];
+                g_SMAPI->Format(szQuery, sizeof(szQuery), 
+                    "DELETE FROM %sadmins WHERE steamid = '%s'",
+                    g_szDatabasePrefix,
+                    szSteamID
+                );
+                g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
+            }
+        });
     }
 
     for(int i = 0; i < 64; i++)
@@ -467,4 +492,46 @@ void RemoveAdmin(const char* szSteamID64, bool bDB)
             g_pAdmins[i].vPermissions.clear();
         }
     }
+}
+
+void AddGroup(const char* szName, const char* szFlags, int iImmunity)
+{
+    char szQuery[512];
+    g_SMAPI->Format(szQuery, sizeof(szQuery), 
+        "INSERT INTO %sgroups (name, flags, immunity) VALUES ('%s', '%s', %d)",
+        g_szDatabasePrefix,
+        szName,
+        szFlags,
+        iImmunity
+    );
+    g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
+}
+
+bool OnlyDigits(const char* szString)
+{
+    for (size_t i = 0; i < strlen(szString); i++)
+    {
+        if (!isdigit(szString[i])) return false;
+    }
+    return true;
+}
+
+void RemoveGroup(const char* szIdentifier)
+{
+    char szQuery[512];
+    if(OnlyDigits(szIdentifier))
+    {
+        g_SMAPI->Format(szQuery, sizeof(szQuery), 
+            "DELETE FROM %sgroups WHERE id = %s",
+            g_szDatabasePrefix,
+            szIdentifier
+        );
+    } else {
+        g_SMAPI->Format(szQuery, sizeof(szQuery), 
+            "DELETE FROM %sgroups WHERE name = '%s'",
+            g_szDatabasePrefix,
+            szIdentifier
+        );
+    }
+    g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
 }

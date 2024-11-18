@@ -84,6 +84,50 @@ CON_COMMAND_EXTERN(mm_ungag, UnPunishCommand, "Unpunish a player");
 CON_COMMAND_EXTERN(mm_unsilence, UnPunishCommand, "Unpunish a player");
 CON_COMMAND_EXTERN(mm_add_admin, AddAdminCommand, "Add an admin");
 CON_COMMAND_EXTERN(mm_remove_admin, RemoveAdminCommand, "Remove an admin");
+CON_COMMAND_EXTERN(mm_add_group, AddGroupCommand, "Add a group");
+CON_COMMAND_EXTERN(mm_remove_group, RemoveGroupCommand, "Remove a group");
+
+void AddGroupCommand(const CCommandContext& context, const CCommand& args)
+{
+	int iAdmin = context.GetPlayerSlot().Get();
+	bool bConsole = iAdmin == -1;
+	if(!bConsole && !g_pAdminApi->HasPermission(iAdmin, "@admin/add_group"))
+	{
+		if(bConsole) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
+	if(args.ArgC() < 4)
+	{
+		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <name> <flags> <immunity>\n", args[0]);
+		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageAddGroup"].c_str(), args[0]);
+		return;
+	}
+	AddGroup(args[1], args[2], std::atoi(args[3]));
+	if(bConsole) META_CONPRINT("[Admin System] Group added\n");
+	else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["GroupAdded"].c_str());
+}
+
+void RemoveGroupCommand(const CCommandContext& context, const CCommand& args)
+{
+	int iAdmin = context.GetPlayerSlot().Get();
+	bool bConsole = iAdmin == -1;
+	if(!bConsole && !g_pAdminApi->HasPermission(iAdmin, "@admin/remove_group"))
+	{
+		if(bConsole) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
+	if(args.ArgC() < 2)
+	{
+		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <id/name>\n", args[0]);
+		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageRemoveGroup"].c_str(), args[0]);
+		return;
+	}
+	RemoveGroup(args[1]);
+	if(bConsole) META_CONPRINT("[Admin System] Group removed\n");
+	else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["GroupRemoved"].c_str());
+}
 
 void AddNewAdmin(int iAdmin, const char* szFlag, const CCommand& args, bool bRemove, bool bConsole)
 {
@@ -93,15 +137,15 @@ void AddNewAdmin(int iAdmin, const char* szFlag, const CCommand& args, bool bRem
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
 		return;
 	}
-	if(bRemove && args.ArgC() < 2)
+	if(bRemove && (bConsole && args.ArgC() < 2) || (!bConsole && args.ArgC() < 3))
 	{
 		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <userid|steamid>\n", args[0]);
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageRemoveAdmin"].c_str(), args[0]);
 		return;
 	}
-	if(!bRemove && args.ArgC() < 5)
+	if(!bRemove && (bConsole && args.ArgC() < 6) || (!bConsole && args.ArgC() < 7))
 	{
-		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <userid|steamid> <name> <flags> <immunity> <time> <groupid>\n", args[0]);
+		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <userid|steamid> <name> <flags> <immunity> <time> <?group> <?comment>\n", args[0]);
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageAddAdmin"].c_str(), args[0]);
 		return;
 	}
@@ -133,7 +177,7 @@ void AddNewAdmin(int iAdmin, const char* szFlag, const CCommand& args, bool bRem
 		}
 		else
 		{
-			AddAdmin(args[2], szSteamID, args[3], std::atoi(args[4]), std::atoi(args[5]), std::atoi(args[6]), args.ArgC() < 7 ? "" : args[7], true); 
+			AddAdmin(strdup(args[2]), szSteamID, strdup(args[3]), std::atoi(args[4]), std::atoi(args[5]), std::atoi(args[6]), args.ArgC() < 7 ? "" : strdup(args[7]), true); 
 			if(bConsole) META_CONPRINT("[Admin System] Admin added\n");
 			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["AdminAdded"].c_str());
 		}
@@ -148,7 +192,7 @@ void AddNewAdmin(int iAdmin, const char* szFlag, const CCommand& args, bool bRem
 		}
 		else
 		{
-			AddAdmin(args[2], args[1], args[3], std::atoi(args[4]), std::atoi(args[5]), std::atoi(args[6]), args.ArgC() < 7 ? "" : args[7], true);
+			AddAdmin(strdup(args[2]), strdup(args[1]), strdup(args[3]), std::atoi(args[4]), std::atoi(args[5]), std::atoi(args[6]), args.ArgC() < 7 ? "" : strdup(args[7]), true);
 			if(bConsole) META_CONPRINT("[Admin System] Admin added\n");
 			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["AdminAdded"].c_str());
 		}
@@ -163,12 +207,24 @@ void AddNewAdmin(int iAdmin, const char* szFlag, const CCommand& args, bool bRem
 void AddAdminCommand(const CCommandContext& context, const CCommand& args)
 {
 	int iAdmin = context.GetPlayerSlot().Get();
+	if(iAdmin != -1 && !g_pAdminApi->HasPermission(iAdmin, "@admin/add"))
+	{
+		if(iAdmin == -1) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
 	AddNewAdmin(iAdmin, "@admin/add", args, false, true);
 }
 
 void RemoveAdminCommand(const CCommandContext& context, const CCommand& args)
 {
 	int iAdmin = context.GetPlayerSlot().Get();
+	if(iAdmin != -1 && !g_pAdminApi->HasPermission(iAdmin, "@admin/remove"))
+	{
+		if(iAdmin == -1) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
 	AddNewAdmin(iAdmin, "@admin/remove", args, true, true);
 }
 
@@ -180,7 +236,7 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
 		return;
 	}
-	if (args.ArgC() < 2)
+	if ((UnPunish && args.ArgC() < 2+!bConsole) || (!UnPunish && args.ArgC() < 4+!bConsole)) 
 	{
 		if(bConsole)
 		{
@@ -215,6 +271,8 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
     std::string arg1 = args[1];
     std::string arg2 = args[2];
     szReason.erase(0, arg1.length() + arg2.length() + 2);
+	if(!bConsole && szReason.length() > 0)
+		szReason.pop_back();
 	if(bFound)
 	{
 		if(UnPunish)
@@ -234,13 +292,13 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 	{
 		if(UnPunish)
 		{
-			RemoveOfflinePunishment(args[1], iType, iAdmin);
+			RemoveOfflinePunishment(strdup(args[1]), iType, iAdmin);
 			if(bConsole) META_CONPRINT("[Admin System] Player unpunished\n");
 			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerUnPunished"].c_str());
 		}
 		else
 		{
-			AddOfflinePunishment(args[1], "undefined", iType, iTime, szReason, iAdmin);
+			AddOfflinePunishment(strdup(args[1]), "undefined", iType, iTime, szReason, iAdmin);
 			if(bConsole) META_CONPRINT("[Admin System] Player punished\n");
 			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerPunished"].c_str());
 		}
@@ -844,11 +902,6 @@ void admin_system::AllPluginsLoaded()
 	g_pUtils->RegCommand(g_PLID, {}, {"!ban", "!mute", "!gag", "!silence", "!unban", "!unmute", "!ungag", "!unsilence"}, [](int iSlot, const char* szContent){
 		CCommand arg;
 		arg.Tokenize(szContent);
-		if(arg.ArgC() < 3)
-		{
-			g_pUtils->PrintToChat(iSlot, g_vecPhrases["UsagePunish"].c_str(), arg[0]);
-			return true;
-		}
 		int iType = 0;
 		const char* szFlag = nullptr;
 		const char* szCommand = arg[0];
@@ -894,7 +947,12 @@ void admin_system::AllPluginsLoaded()
 		const char* szFlag = nullptr;
 		if(strcmp(arg[0], "!add_admin") == 0)
 		{
-			if(arg.ArgC() < 5)
+			if(!g_pAdminApi->HasPermission(iSlot, "@admin/add_admin"))
+			{
+				g_pUtils->PrintToChat(iSlot, g_vecPhrases["NoPermission"].c_str());
+				return true;
+			}
+			if(arg.ArgC() < 7)
 			{
 				g_pUtils->PrintToChat(iSlot, g_vecPhrases["UsageAddAdmin"].c_str(), arg[0]);
 				return true;
@@ -903,12 +961,54 @@ void admin_system::AllPluginsLoaded()
 		}
 		else
 		{
-			if(arg.ArgC() < 2)
+			if(!g_pAdminApi->HasPermission(iSlot, "@admin/remove_admin"))
+			{
+				g_pUtils->PrintToChat(iSlot, g_vecPhrases["NoPermission"].c_str());
+				return true;
+			}
+			if(arg.ArgC() < 3)
 			{
 				g_pUtils->PrintToChat(iSlot, g_vecPhrases["UsageRemoveAdmin"].c_str(), arg[0]);
 				return true;
 			}
 			AddNewAdmin(iSlot, "@admin/remove", arg, true, false);
+		}
+		return true;
+	});
+
+	g_pUtils->RegCommand(g_PLID, {}, {"!add_group", "!remove_group"}, [](int iSlot, const char* szContent){
+		CCommand arg;
+		arg.Tokenize(szContent);
+		const char* szFlag = nullptr;
+		if(strcmp(arg[0], "!add_group") == 0)
+		{
+			if(!g_pAdminApi->HasPermission(iSlot, "@admin/add_group"))
+			{
+				g_pUtils->PrintToChat(iSlot, g_vecPhrases["NoPermission"].c_str());
+				return true;
+			} 
+			if(arg.ArgC() < 5)
+			{
+				g_pUtils->PrintToChat(iSlot, g_vecPhrases["UsageAddGroup"].c_str(), arg[0]);
+				return true;
+			}
+			AddGroup(arg[1], arg[2], atoi(arg[3]));
+			g_pUtils->PrintToChat(iSlot, g_vecPhrases["GroupAdded"].c_str());
+		}
+		else
+		{
+			if(!g_pAdminApi->HasPermission(iSlot, "@admin/remove_group"))
+			{
+				g_pUtils->PrintToChat(iSlot, g_vecPhrases["NoPermission"].c_str());
+				return true;
+			}
+			if(arg.ArgC() < 3)
+			{
+				g_pUtils->PrintToChat(iSlot, g_vecPhrases["UsageRemoveGroup"].c_str(), arg[0]);
+				return true;
+			}
+			RemoveGroup(arg[1]);
+			g_pUtils->PrintToChat(iSlot, g_vecPhrases["GroupRemoved"].c_str());
 		}
 		return true;
 	});
@@ -1223,7 +1323,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0";
+	return "1.0.1";
 }
 
 const char* admin_system::GetDate()

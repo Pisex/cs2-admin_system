@@ -1,4 +1,4 @@
-#Install
+# Install
 1. Download and install last Release
 2. Download and install [sql_mm](https://github.com/zer0k-z/sql_mm/releases)
 3. Customize the configuration file(addons/configs/admin_system/core.ini)
@@ -19,7 +19,7 @@
 }
 ```
 
-#Commands
+# Commands
 - `mm_admin/css_admin/!admin` - Main menu
 
 - `mm_ban/!ban <steamid/userid> <time> <reason>` - Ban command (@admin/ban)
@@ -32,8 +32,11 @@
 - `mm_ungag/!ungag <steamid/userid>` - UnGag command (@admin/ungag)
 - `mm_unsilence/!unsilence <steamid/userid>` - UnSilence command (@admin/unsilence)
 
-- `mm_add_admin/!add_admin <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>` - Add new Admin (@admin/add)
-- `mm_remove_admin/!remove_admin <steamid/userid>` - Remove Admin (@admin/remove)
+- `mm_add_admin/!add_admin <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>` - Add new Admin (@admin/add_admin)
+- `mm_remove_admin/!remove_admin <steamid/userid>` - Remove Admin (@admin/remove_admin)
 
-#Info
+- `mm_add_group/!add_group <name> <flags> <immunity>` - Add new group (@admin/add_group)
+- `mm_remove_group/!remove_group <id/name>` - Remove group (@admin/remove_group)
+
+# Info
 - If you want to grant all rights, it will be enough to specify the @admin/root flag to the player

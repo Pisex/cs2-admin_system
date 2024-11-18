@@ -341,15 +341,39 @@
 	}
 	"UsageAddAdmin"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <group>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <group>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <group>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
 	}
 	"UsageRemoveAdmin"
 	{
 		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
 		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
 		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+	}
+	"UsageAddGroup"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name> <flags> <immunity>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name> <flags> <immunity>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name> <flags> <immunity>"
+	}
+	"GroupAdded"
+	{
+		"ru"	"Вы успешно добавили группу"
+		"ua"	"Ви успішно додали групу"
+		"en"	"You have successfully added group"
+	}
+	"GroupRemoved"
+	{
+		"ru"	"Вы успешно удалили группу"
+		"ua"	"Ви успішно видалили групу"
+		"en"	"You have successfully removed group"
+	}
+	"UsageRemoveGroup"
+	{
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <id/name>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <id/name>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <id/name>"
 	}
 	"AdminRemoved"
 	{
