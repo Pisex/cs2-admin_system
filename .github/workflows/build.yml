@@ -94,9 +94,13 @@ jobs:
       - name: Find downloaded artifact
         id: find_artifact
         run: echo "ARTIFACT=$(ls | grep '\.zip$')" >> $GITHUB_ENV
+
+      - name: Get commit message
+        id: get_commit_message
+        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
   
       - name: Upload release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ needs.build.outputs.buildnumber }}
+          tag_name: ${{ env.COMMIT_MESSAGE }}
           files: ${{ env.ARTIFACT }}
