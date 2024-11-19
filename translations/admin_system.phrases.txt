@@ -359,9 +359,9 @@
 	}
 	"GroupAdded"
 	{
-		"ru"	"Вы успешно добавили группу"
-		"ua"	"Ви успішно додали групу"
-		"en"	"You have successfully added group"
+		"ru"	"Вы успешно добавили группу (ID: %i)"
+		"ua"	"Ви успішно додали групу (ID: %i)"
+		"en"	"You have successfully added group (ID: %i)"
 	}
 	"GroupRemoved"
 	{

@@ -18,6 +18,6 @@ void RemovePunishment(int iSlot, int iType, int iAdminID);
 void RemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID);
 void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, int iImmunity, int iTime, int iGroupID, const char* szComment, bool bDB);
 void RemoveAdmin(const char* szSteamID64, bool bDB);
-void AddGroup(const char* szName, const char* szFlags, int iImmunity);
+void AddGroup(int iSlot, const char* szName, const char* szFlags, int iImmunity, bool bConsole);
 void RemoveGroup(const char* szIdentifier);
 #endif

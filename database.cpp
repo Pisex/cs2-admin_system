@@ -494,7 +494,7 @@ void RemoveAdmin(const char* szSteamID64, bool bDB)
     }
 }
 
-void AddGroup(const char* szName, const char* szFlags, int iImmunity)
+void AddGroup(int iSlot, const char* szName, const char* szFlags, int iImmunity, bool bConsole)
 {
     char szQuery[512];
     g_SMAPI->Format(szQuery, sizeof(szQuery), 
@@ -504,7 +504,16 @@ void AddGroup(const char* szName, const char* szFlags, int iImmunity)
         szFlags,
         iImmunity
     );
-    g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
+    g_pConnection->Query(szQuery, [bConsole, iSlot](ISQLQuery* query) {
+        int iGroupID = query->GetInsertId();
+        if(iSlot == -1) {
+            META_CONPRINTF("[Admin System] Group added (ID: %i)\n", iGroupID);
+        }
+        else {
+            if(bConsole) g_pUtils->PrintToConsole(iSlot, "[Admin System] Group added (ID: %i)\n", iGroupID);
+            else g_pUtils->PrintToChat(iSlot, g_pAdminApi->GetTranslation("GroupAdded"), iGroupID);
+        }
+    });
 }
 
 bool OnlyDigits(const char* szString)

@@ -103,9 +103,7 @@ void AddGroupCommand(const CCommandContext& context, const CCommand& args)
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageAddGroup"].c_str(), args[0]);
 		return;
 	}
-	AddGroup(args[1], args[2], std::atoi(args[3]));
-	if(bConsole) META_CONPRINT("[Admin System] Group added\n");
-	else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["GroupAdded"].c_str());
+	AddGroup(iAdmin, args[1], args[2], std::atoi(args[3]), true);
 }
 
 void RemoveGroupCommand(const CCommandContext& context, const CCommand& args)
@@ -992,8 +990,7 @@ void admin_system::AllPluginsLoaded()
 				g_pUtils->PrintToChat(iSlot, g_vecPhrases["UsageAddGroup"].c_str(), arg[0]);
 				return true;
 			}
-			AddGroup(arg[1], arg[2], atoi(arg[3]));
-			g_pUtils->PrintToChat(iSlot, g_vecPhrases["GroupAdded"].c_str());
+			AddGroup(iSlot, arg[1], arg[2], atoi(arg[3]), false);
 		}
 		else
 		{
@@ -1323,7 +1320,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.1";
+	return "1.0.1.1";
 }
 
 const char* admin_system::GetDate()
