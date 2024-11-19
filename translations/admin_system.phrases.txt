@@ -141,6 +141,12 @@
 	//////////////////////
 	////////Chat////////
 	//////////////////////
+	"AdminChat"
+	{
+		"ru"	" {GREEN}[Админ-чат]{DEFAULT} %s: %s"
+		"ua"	" {GREEN}[Адмін-чат]{DEFAULT} %s: %s"
+		"en"	" {GREEN}[Admin-chat]{DEFAULT} %s: %s"
+	}
 	"MuteExpired"
 	{
 		"ru"	"Время мута истекло"
