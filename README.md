@@ -40,3 +40,5 @@
 
 # Info
 - If you want to grant all rights, it will be enough to specify the @admin/root flag to the player
+- Sorting category: punishments
+- Sorting items: punish, unpunish, punish_offline, unpunish_offline
