@@ -53,6 +53,7 @@ public:
 		return vecResult;
 	}
 	void RegisterCategory(const char* szIdentity, const char* szName, OnCategoryDisplayCallback callback) override {
+		if (mCategories.find(szIdentity) != mCategories.end()) return;
 		for (auto& it : mOnCategoryRegister) it.second(szIdentity);
 		mCategories[szIdentity].szIdentity = szIdentity;
 		mCategories[szIdentity].szName = szName;
