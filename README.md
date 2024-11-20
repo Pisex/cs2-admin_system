@@ -38,6 +38,10 @@
 - `mm_add_group/!add_group <name> <flags> <immunity>` - Add new group (@admin/add_group)
 - `mm_remove_group/!remove_group <id/name>` - Remove group (@admin/remove_group)
 
+- `mm_as_reload_config` - Reload config (@admin/reload_config)
+- `mm_as_reload_admin <steamid64>` - Reload admin (@admin/reload_admin)
+- `mm_as_reload_punish <steamid64>` - Reload punishments (@admin/reload_punish)
+
 # Info
 - If you want to grant all rights, it will be enough to specify the @admin/root flag to the player
 - Sorting category: punishments
