@@ -141,6 +141,24 @@
 	//////////////////////
 	////////Chat////////
 	//////////////////////
+	"ConfigReloaded"
+	{
+		"ru"	"Вы успешно перезагрузили конфигурацию\n"
+		"ua"	"Ви успішно перезавантажили конфігурацію\n"
+		"en"	"You have successfully reloaded the configuration\n"
+	}
+	"UsageReloadAdmin"
+	{
+		"ru"	"Используйте: %s <steamid64>\n"
+		"ua"	"Використовуйте: %s <steamid64>\n"
+		"en"	"Usage: %s <steamid64>\n"
+	}
+	"UsageReloadPunish"
+	{
+		"ru"	"Используйте: %s <steamid64>\n"
+		"ua"	"Використовуйте: %s <steamid64>\n"
+		"en"	"Usage: %s <steamid64>\n"
+	}
 	"Admins_Title"
 	{
 		"ru"	"Администраторы онлайн"

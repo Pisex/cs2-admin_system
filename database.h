@@ -20,4 +20,5 @@ void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, 
 void RemoveAdmin(const char* szSteamID64, bool bDB);
 void AddGroup(int iSlot, const char* szName, const char* szFlags, int iImmunity, bool bConsole);
 void RemoveGroup(const char* szIdentifier);
+bool OnlyDigits(const char* szString);
 #endif

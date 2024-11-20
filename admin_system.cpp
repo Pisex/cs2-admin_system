@@ -87,6 +87,105 @@ CON_COMMAND_EXTERN(mm_remove_admin, RemoveAdminCommand, "Remove an admin");
 CON_COMMAND_EXTERN(mm_add_group, AddGroupCommand, "Add a group");
 CON_COMMAND_EXTERN(mm_remove_group, RemoveGroupCommand, "Remove a group");
 
+CON_COMMAND_EXTERN(mm_as_reload_config, OnReloadConfig, "Reload the admin system config");
+CON_COMMAND_EXTERN(mm_as_reload_admin, OnReloadAdmin, "Reload the admin system admins");
+CON_COMMAND_EXTERN(mm_as_reload_punish, OnReloadPunish, "Reload the admin system punishments");
+
+void LoadConfig();
+void LoadSorting();
+void LoadTranslations();
+
+void OnReloadPunish(const CCommandContext& context, const CCommand& args)
+{
+	int iAdmin = context.GetPlayerSlot().Get();
+	bool bConsole = iAdmin == -1;
+	if(!bConsole && !g_pAdminApi->HasPermission(iAdmin, "@admin/reload_punish"))
+	{
+		if(bConsole) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
+	if(args.ArgC() < 2 && OnlyDigits(args[1]))
+	{
+		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <steamid64>\n", args[0]);
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["UsageReloadPunish"].c_str(), args[0]);
+		return;
+	}
+    bool bFound = false;
+    int iSlot = -1;
+    for(int i = 0; i < 64; i++)
+    {
+        CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
+        if(!pPlayer) continue;
+        if(g_pPlayers->GetSteamID64(i) == std::stoull(args[1]))
+        {
+            bFound = true;
+            iSlot = i;
+        }
+    }
+	if(bFound) CheckPunishments(iSlot, std::stoull(args[1]));
+}
+
+void OnReloadAdmin(const CCommandContext& context, const CCommand& args)
+{
+	int iAdmin = context.GetPlayerSlot().Get();
+	bool bConsole = iAdmin == -1;
+	if(!bConsole && !g_pAdminApi->HasPermission(iAdmin, "@admin/reload_admin"))
+	{
+		if(bConsole) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
+	if(args.ArgC() < 2 && OnlyDigits(args[1]))
+	{
+		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <steamid64>\n", args[0]);
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["UsageReloadAdmin"].c_str(), args[0]);
+		return;
+	}
+    bool bFound = false;
+    int iSlot = -1;
+    for(int i = 0; i < 64; i++)
+    {
+        CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
+        if(!pPlayer) continue;
+        if(g_pPlayers->GetSteamID64(i) == std::stoull(args[1]))
+        {
+            bFound = true;
+            iSlot = i;
+        }
+    }
+	if(bFound) CheckPermissions(iSlot, std::stoull(args[1]));
+}
+
+void OnReloadConfig(const CCommandContext& context, const CCommand& args)
+{
+	int iAdmin = context.GetPlayerSlot().Get();
+	bool bConsole = iAdmin == -1;
+	if(!bConsole && !g_pAdminApi->HasPermission(iAdmin, "@admin/reload_config"))
+	{
+		if(bConsole) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		g_mReasons[i].clear();
+		g_vReasons[i].clear();
+		g_mTimes[i].clear();
+	}
+	g_vecPhrases.clear();
+	g_mFlags.clear();
+	g_vSortCategories.clear();
+	g_mSortItems.clear();
+	g_vecDefaultFlags.clear();
+
+	LoadConfig();
+	LoadSorting();
+	LoadTranslations();
+	if(bConsole) META_CONPRINT("[Admin System] Config reloaded\n");
+	else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["ConfigReloaded"].c_str());
+}
+
 void AddGroupCommand(const CCommandContext& context, const CCommand& args)
 {
 	int iAdmin = context.GetPlayerSlot().Get();
@@ -94,13 +193,13 @@ void AddGroupCommand(const CCommandContext& context, const CCommand& args)
 	if(!bConsole && !g_pAdminApi->HasPermission(iAdmin, "@admin/add_group"))
 	{
 		if(bConsole) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
-		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["NoPermission"].c_str());
 		return;
 	}
 	if(args.ArgC() < 4)
 	{
 		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <name> <flags> <immunity>\n", args[0]);
-		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageAddGroup"].c_str(), args[0]);
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["UsageAddGroup"].c_str(), args[0]);
 		return;
 	}
 	AddGroup(iAdmin, args[1], args[2], std::atoi(args[3]), true);
@@ -113,18 +212,18 @@ void RemoveGroupCommand(const CCommandContext& context, const CCommand& args)
 	if(!bConsole && !g_pAdminApi->HasPermission(iAdmin, "@admin/remove_group"))
 	{
 		if(bConsole) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
-		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["NoPermission"].c_str());
 		return;
 	}
 	if(args.ArgC() < 2)
 	{
 		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <id/name>\n", args[0]);
-		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageRemoveGroup"].c_str(), args[0]);
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["UsageRemoveGroup"].c_str(), args[0]);
 		return;
 	}
 	RemoveGroup(args[1]);
 	if(bConsole) META_CONPRINT("[Admin System] Group removed\n");
-	else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["GroupRemoved"].c_str());
+	else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["GroupRemoved"].c_str());
 }
 
 void AddNewAdmin(int iAdmin, const char* szFlag, const CCommand& args, bool bRemove, bool bConsole)
@@ -513,7 +612,7 @@ void LoadSorting()
 {
 	KeyValues* pKVConfig = new KeyValues("Config");
     if (!pKVConfig->LoadFromFile(g_pFullFileSystem, "addons/configs/admin_system/sorting.ini")) {
-        g_pUtils->ErrorLog("[%s] Failed to load databases config addons/configs/admin_system/sorting.ini", g_PLAPI->GetLogTag());
+        g_pUtils->ErrorLog("[%s] Failed to load config addons/configs/admin_system/sorting.ini", g_PLAPI->GetLogTag());
         return;
     }
 
@@ -532,7 +631,7 @@ void LoadConfig()
 {
 	KeyValues* pKVConfig = new KeyValues("Config");
     if (!pKVConfig->LoadFromFile(g_pFullFileSystem, "addons/configs/admin_system/core.ini")) {
-        g_pUtils->ErrorLog("[%s] Failed to load databases config addons/configs/admin_system/core.ini", g_PLAPI->GetLogTag());
+        g_pUtils->ErrorLog("[%s] Failed to load config addons/configs/admin_system/core.ini", g_PLAPI->GetLogTag());
         return;
     }
 	g_szDatabasePrefix = pKVConfig->GetString("database_prefix", "as_");
@@ -687,7 +786,6 @@ void LoadConfig()
 				}
 			}
 		}
-
 		KeyValues* pKVTimes = pKVConfig->FindKey("times", false);
 		if(pKVTimes)
 		{
@@ -832,11 +930,11 @@ void admin_system::AllPluginsLoaded()
 	LoadTranslations();
 	CreateConnection();
 
-	g_pAdminCore->RegisterCategory("punishments", 	g_vecPhrases["Category_Punishments"].c_str(), 		nullptr);
-	g_pAdminCore->RegisterItem("punish", 			g_vecPhrases["Item_PunishPlayer"].c_str(), 			"punishments", "@admin/ban|@admin/mute|@admin/gag|@admin/silence", 			nullptr, OnPunishSelect);
-	g_pAdminCore->RegisterItem("unpunish", 			g_vecPhrases["Item_UnPunishPlayer"].c_str(), 		"punishments", "@admin/unban|@admin/unmute|@admin/ungag|@admin/unsilence", 	nullptr, OnUnPunishSelect);
-	g_pAdminCore->RegisterItem("punish_offline", 	g_vecPhrases["Item_PunishOfflinePlayer"].c_str(), 	"punishments", "@admin/ban|@admin/mute|@admin/gag|@admin/silence", 			nullptr, OnPunishOfflineSelect);
-	g_pAdminCore->RegisterItem("unpunish_offline", 	g_vecPhrases["Item_UnPunishOfflinePlayer"].c_str(), "punishments", "@admin/unban|@admin/unmute|@admin/ungag|@admin/unsilence", 	nullptr, OnUnPunishOfflineSelect);
+	g_pAdminCore->RegisterCategory("punishments", 	"Category_Punishments", 		nullptr);
+	g_pAdminCore->RegisterItem("punish", 			"Item_PunishPlayer", 			"punishments", "@admin/ban|@admin/mute|@admin/gag|@admin/silence", 			nullptr, OnPunishSelect);
+	g_pAdminCore->RegisterItem("unpunish", 			"Item_UnPunishPlayer", 		"punishments", "@admin/unban|@admin/unmute|@admin/ungag|@admin/unsilence", 	nullptr, OnUnPunishSelect);
+	g_pAdminCore->RegisterItem("punish_offline", 	"Item_PunishOfflinePlayer", 	"punishments", "@admin/ban|@admin/mute|@admin/gag|@admin/silence", 			nullptr, OnPunishOfflineSelect);
+	g_pAdminCore->RegisterItem("unpunish_offline", 	"Item_UnPunishOfflinePlayer", "punishments", "@admin/unban|@admin/unmute|@admin/ungag|@admin/unsilence", 	nullptr, OnUnPunishOfflineSelect);
 
 	g_pUtils->StartupServer(g_PLID, StartupServer);
 	g_pUtils->HookIsHearingClient(g_PLID, OnHearingClient);
@@ -1320,7 +1418,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.1.2";
+	return "1.0.2";
 }
 
 const char* admin_system::GetDate()

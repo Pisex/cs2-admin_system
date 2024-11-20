@@ -421,13 +421,14 @@ void ShowCategoryMenu(int iSlot, const char* szCategory)
 {
     Category& category = mCategories[szCategory];
     Menu hMenu;
-    g_pMenus->SetTitleMenu(hMenu, category.szName);
+    g_pMenus->SetTitleMenu(hMenu, g_pAdminApi->GetTranslation(category.szName));
     if(g_mSortItems.find(szCategory) != g_mSortItems.end())
     {
         for (const auto& item : g_mSortItems[szCategory]) {
+            if(!category.mItems[item].szCategory[0] || !category.mItems[item].szIdentity[0]) continue;
             const Item& _item = category.mItems[item];
             if(!HasAccessInCategory(iSlot, _item.szCategory)) continue;
-            std::string szName = _item.szName;
+            std::string szName = g_pAdminApi->GetTranslation(_item.szName);
             if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
             g_pMenus->AddItemMenu(hMenu, _item.szIdentity, szName.c_str());
         }
@@ -437,7 +438,7 @@ void ShowCategoryMenu(int iSlot, const char* szCategory)
         if(g_mSortItems[szCategory].size() > 0 && std::find(g_mSortItems[szCategory].begin(), g_mSortItems[szCategory].end(), key) != g_mSortItems[szCategory].end()) continue;
         const Item& _item = item.second;
         if(!HasAccessInCategory(iSlot, _item.szCategory)) continue;
-        std::string szName = _item.szName;
+        std::string szName = g_pAdminApi->GetTranslation(_item.szName);
         if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
         g_pMenus->AddItemMenu(hMenu, _item.szIdentity, szName.c_str());
     }
@@ -456,7 +457,7 @@ void OnAdminMenuCallback(const char* szBack, const char* szFront, int iItem, int
 {
     if(iItem < 7)
     {
-        g_szLastCategory[iSlot] = szBack;
+        g_szLastCategory[iSlot] = strdup(szBack);
         ShowCategoryMenu(iSlot, g_szLastCategory[iSlot].c_str());
     }
 }
@@ -469,7 +470,8 @@ bool OnAdminMenu(int iSlot, const char* szContent)
     for (const auto& category : g_vSortCategories) {
         if(!HasAccessInCategory(iSlot, category.c_str())) continue;
         const Category& _category = mCategories[category];
-        std::string szName = _category.szName;
+        if(!_category.szIdentity[0]) continue;
+        std::string szName = g_pAdminApi->GetTranslation(_category.szName);
         if(_category.hCallback) _category.hCallback(iSlot, category.c_str(), szName);
         g_pMenus->AddItemMenu(hMenu, category.c_str(), szName.c_str());
     }
@@ -479,7 +481,7 @@ bool OnAdminMenu(int iSlot, const char* szContent)
         if(g_vSortCategories.size() > 0 && std::find(g_vSortCategories.begin(), g_vSortCategories.end(), key) != g_vSortCategories.end()) continue;
         const Category& category = item.second;
         const char* szIdentity = category.szIdentity;
-        std::string szName = category.szName;
+        std::string szName = g_pAdminApi->GetTranslation(category.szName);
         if(!HasAccessInCategory(iSlot, szIdentity)) continue;
         if(category.hCallback) category.hCallback(iSlot, szIdentity, szName);
         g_pMenus->AddItemMenu(hMenu, key.c_str(), szName.c_str());

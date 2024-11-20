@@ -245,7 +245,7 @@ void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
     
     g_iPunishments[iSlot][iType] = iTime == 0 ? 0 : std::time(0) + iTime;
     g_szPunishReasons[iSlot][iType] = szReason;
-    g_iAdminPunish[iSlot][iType] = g_pPlayers->GetSteamID64(iSlot);
+    g_iAdminPunish[iSlot][iType] = g_pPlayers->GetSteamID64(iAdminID);
     g_pAdminApi->OnPlayerPunishSend(iSlot, iType, iTime, szReason.c_str(), iAdminID);
     if(iType == RT_BAN) {
         if(g_iBanDelay > 0) {
