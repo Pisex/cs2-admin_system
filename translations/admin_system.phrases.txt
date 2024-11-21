@@ -31,7 +31,7 @@
 	{
 		"ru"	"Нет доступных игроков"
 		"ua"	"Немає доступних гравців"
-		"en"	"No available players"
+		"en"	"No available players" 
 	}
 	"Category_Punishments"
 	{
@@ -659,100 +659,100 @@
 	}
 	"UsageDefault"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
 	}
 	"UsageSwitchTeam"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <0-3>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <0-3>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <0-3>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <0-3>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <0-3>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <0-3>"
 	}
 	"UsageSlap"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <damage>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <damage>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <damage>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <damage>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <damage>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <damage>"
 	}
 	"UsageRename"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <name>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <name>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <name>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <name>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <name>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <name>"
 	}
 	//Fun Commands
 	"Usage_Gravity"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <gravity>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <gravity>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <gravity>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <gravity>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <gravity>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <gravity>"
 	}
 	"Usage_HP"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <hp>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <hp>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <hp>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <hp>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <hp>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <hp>"
 	}
 	"Usage_Armor"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <armor>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <armor>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <armor>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <armor>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <armor>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <armor>"
 	}
 	"Usage_Scale"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <scale>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <scale>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <scale>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <scale>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <scale>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <scale>"
 	}
 	"Usage_Speed"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <speed>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <speed>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <speed>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <speed>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <speed>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <speed>"
 	}
 	"Usage_God"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <1/0>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <1/0>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <1/0>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <1/0>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <1/0>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <1/0>"
 	}
 	"Usage_Freeze"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <time>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <time>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <time>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time>"
 	}
 	"Usage_Unfreeze"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
 	}
 	"Usage_Blind"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid> <time>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid> <time>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid> <time>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time>"
 	}
 	"Usage_Unblind"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
 	}
 	"Usage_Bury"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
 	}
 	"Usage_Unbury"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <userid>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <userid>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
 	}
 	"AdminGravityMessage"
 	{
