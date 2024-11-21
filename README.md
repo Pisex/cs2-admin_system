@@ -22,18 +22,18 @@
 # Commands
 - `mm_admin/css_admin/!admin` - Main menu
 
-- `mm_ban/!ban <steamid/userid> <time> <reason>` - Ban command (@admin/ban)
-- `mm_mute/!mute <steamid/userid> <time> <reason>` - Mute command (@admin/mute)
-- `mm_gag/!gag <steamid/userid> <time> <reason>` - Gag command (@admin/gag)
-- `mm_silence/!silence <steamid/userid> <time> <reason>` - Silence command (@admin/silence)
+- `mm_ban/!ban <name/steamid/userid> <time> <reason>` - Ban command (@admin/ban)
+- `mm_mute/!mute <name/steamid/userid> <time> <reason>` - Mute command (@admin/mute)
+- `mm_gag/!gag <name/steamid/userid> <time> <reason>` - Gag command (@admin/gag)
+- `mm_silence/!silence <name/steamid/userid> <time> <reason>` - Silence command (@admin/silence)
 
-- `mm_unban/!unban <steamid/userid>` - UnBan command (@admin/unban)
-- `mm_unmute/!unmute <steamid/userid>` - UnMute command (@admin/unmute)
-- `mm_ungag/!ungag <steamid/userid>` - UnGag command (@admin/ungag)
-- `mm_unsilence/!unsilence <steamid/userid>` - UnSilence command (@admin/unsilence)
+- `mm_unban/!unban <name/steamid/userid>` - UnBan command (@admin/unban)
+- `mm_unmute/!unmute <name/steamid/userid>` - UnMute command (@admin/unmute)
+- `mm_ungag/!ungag <name/steamid/userid>` - UnGag command (@admin/ungag)
+- `mm_unsilence/!unsilence <name/steamid/userid>` - UnSilence command (@admin/unsilence)
 
-- `mm_add_admin/!add_admin <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>` - Add new Admin (@admin/add_admin)
-- `mm_remove_admin/!remove_admin <steamid/userid>` - Remove Admin (@admin/remove_admin)
+- `mm_add_admin/!add_admin <name/steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>` - Add new Admin (@admin/add_admin)
+- `mm_remove_admin/!remove_admin <name/steamid/userid>` - Remove Admin (@admin/remove_admin)
 
 - `mm_add_group/!add_group <name> <flags> <immunity>` - Add new group (@admin/add_group)
 - `mm_remove_group/!remove_group <id/name>` - Remove group (@admin/remove_group)
