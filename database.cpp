@@ -55,7 +55,7 @@ void CreateConnection()
 
             g_SMAPI->Format(szQuery, sizeof(szQuery), "CREATE TABLE IF NOT EXISTS %sgroups (\
                                         id INT PRIMARY KEY AUTO_INCREMENT,\
-                                        name VARCHAR(256),\
+                                        name VARCHAR(128),\
                                         flags VARCHAR(64),\
                                         immunity INT,\
                                         UNIQUE (name)\

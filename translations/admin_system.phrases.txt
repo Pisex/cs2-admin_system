@@ -335,15 +335,15 @@
 	}
 	"UsagePunish"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <time> <reason>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <time> <reason>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid> <time> <reason>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time> <reason>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time> <reason>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <time> <reason>"
 	}
 	"UsageUnPunish"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
 	}
 	"NoPermission"
 	{
@@ -371,15 +371,15 @@
 	}
 	"UsageAddAdmin"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid> <name> <flags> <immunity> <time> <?group> <?comment>"
 	}
 	"UsageRemoveAdmin"
 	{
-		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
-		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
-		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <steamid/userid>"
+		"ru"	"Используйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"ua"	"Використовуйте: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
+		"en"	"Usage: {LIGHTRED}%s{DEFAULT} <name/steamid/userid>"
 	}
 	"UsageAddGroup"
 	{

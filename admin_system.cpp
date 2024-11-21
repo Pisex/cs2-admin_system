@@ -234,13 +234,13 @@ void AddNewAdmin(int iAdmin, const char* szFlag, const CCommand& args, bool bRem
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
 		return;
 	}
-	if(bRemove && (bConsole && args.ArgC() < 2) || (!bConsole && args.ArgC() < 3))
+	if(bRemove && ((bConsole && args.ArgC() < 2) || (!bConsole && args.ArgC() < 3)))
 	{
 		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <userid|steamid>\n", args[0]);
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageRemoveAdmin"].c_str(), args[0]);
 		return;
 	}
-	if(!bRemove && (bConsole && args.ArgC() < 6) || (!bConsole && args.ArgC() < 7))
+	if(!bRemove && ((bConsole && args.ArgC() < 6) || (!bConsole && args.ArgC() < 7)))
 	{
 		if(bConsole) META_CONPRINTF("[Admin System] Usage: %s <userid|steamid> <name> <flags> <immunity> <time> <?group> <?comment>\n", args[0]);
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["UsageAddAdmin"].c_str(), args[0]);
@@ -256,7 +256,7 @@ void AddNewAdmin(int iAdmin, const char* szFlag, const CCommand& args, bool bRem
 		if (!pController) continue;
 		uint m_steamID = pController->m_steamID();
 		if(m_steamID == 0) continue;
-		if(m_steamID == std::stoll(args[1]) || std::stoll(args[1]) == i)
+		if(strcasestr(engine->GetClientConVarValue(i, "name"), args[1]) || (containsOnlyDigits(args[1]) && m_steamID == std::stoll(args[1])) || (containsOnlyDigits(args[1]) && std::stoll(args[1]) == i))
 		{
 			bFound = true;
 			iSlot = i;
@@ -356,7 +356,7 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 		if (!pController) continue;
 		uint m_steamID = pController->m_steamID();
 		if(m_steamID == 0) continue;
-		if(m_steamID == std::stoll(args[1]) || std::stoll(args[1]) == i)
+		if(strcasestr(engine->GetClientConVarValue(i, "name"), args[1]) || (containsOnlyDigits(args[1]) && m_steamID == std::stoll(args[1])) || (containsOnlyDigits(args[1]) && std::stoll(args[1]) == i))
 		{
 			bFound = true;
 			iSlot = i;
@@ -429,6 +429,12 @@ void UnPunishCommand(const CCommandContext& context, const CCommand& args)
 		szFlag = "@admin/unsilence";
 	}
 	int iAdmin = context.GetPlayerSlot().Get();
+	if(iAdmin != -1 && !g_pAdminApi->HasPermission(iAdmin, szFlag))
+	{
+		if(iAdmin == -1) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
 	TotalCommand(iAdmin, iType, szFlag, args, true, true);
 }
 
@@ -454,6 +460,12 @@ void PunishCommand(const CCommandContext& context, const CCommand& args)
 		szFlag = "@admin/silence";
 	}
 	int iAdmin = context.GetPlayerSlot().Get();
+	if(iAdmin != -1 && !g_pAdminApi->HasPermission(iAdmin, szFlag))
+	{
+		if(iAdmin == -1) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		else g_pUtils->PrintToConsole(iAdmin, g_vecPhrases["NoPermission"].c_str());
+		return;
+	}
 	TotalCommand(iAdmin, iType, szFlag, args, true, false);
 }
 
@@ -1033,6 +1045,11 @@ void admin_system::AllPluginsLoaded()
 			iType = RT_SILENCE;
 			szFlag = "@admin/unsilence";
 		}
+		if(!g_pAdminApi->HasPermission(iSlot, szFlag))
+		{
+			g_pUtils->PrintToChat(iSlot, g_vecPhrases["NoPermission"].c_str());
+			return true;
+		}
 		TotalCommand(iSlot, iType, szFlag, arg, false, arg[0][1] == 'u');		
 		return true;
 	});
@@ -1418,7 +1435,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.2";
+	return "1.0.2.1";
 }
 
 const char* admin_system::GetDate()
