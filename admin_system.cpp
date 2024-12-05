@@ -1126,6 +1126,26 @@ void admin_system::AllPluginsLoaded()
 	});
 }
 
+bool HasAccessInItem(int iSlot, const char* szCategory, const char* szItem)
+{
+	if(g_pAdmins[iSlot].vPermissions.empty()) return false;
+	for (const auto& item : mCategories[szCategory].mItems)
+	{
+		const std::string& key = item.first;
+		const Item& _item = item.second;
+		if(key == szItem)
+		{
+			for (const auto& flag : _item.vecFlags) {
+				if (std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), flag) != g_pAdmins[iSlot].vPermissions.end() || 
+					std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), "@admin/root") != g_pAdmins[iSlot].vPermissions.end()) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 bool HasAccessInCategory(int iSlot, const char* szCategory)
 {
 	if(g_pAdmins[iSlot].vPermissions.empty()) return false;
@@ -1435,7 +1455,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.2.1";
+	return "1.0.2.2";
 }
 
 const char* admin_system::GetDate()

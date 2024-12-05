@@ -15,6 +15,7 @@ extern std::map<std::string, std::string> g_vecPhrases;
 extern ISmmAPI *g_SMAPI;
 extern ISmmPlugin *g_PLAPI;
 
+extern bool HasAccessInItem(int iSlot, const char* szCategory, const char* szItem);
 extern bool HasAccessInCategory(int iSlot, const char* szCategory);
 extern int g_iImmunityType;
 extern int g_iUnpunishType;
@@ -427,7 +428,7 @@ void ShowCategoryMenu(int iSlot, const char* szCategory)
         for (const auto& item : g_mSortItems[szCategory]) {
             if(!category.mItems[item].szCategory[0] || !category.mItems[item].szIdentity[0]) continue;
             const Item& _item = category.mItems[item];
-            if(!HasAccessInCategory(iSlot, _item.szCategory)) continue;
+            if(!HasAccessInItem(iSlot, _item.szCategory, _item.szIdentity)) continue;
             std::string szName = g_pAdminApi->GetTranslation(_item.szName);
             if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
             g_pMenus->AddItemMenu(hMenu, _item.szIdentity, szName.c_str());
@@ -437,7 +438,7 @@ void ShowCategoryMenu(int iSlot, const char* szCategory)
         const std::string& key = item.first;
         if(g_mSortItems[szCategory].size() > 0 && std::find(g_mSortItems[szCategory].begin(), g_mSortItems[szCategory].end(), key) != g_mSortItems[szCategory].end()) continue;
         const Item& _item = item.second;
-        if(!HasAccessInCategory(iSlot, _item.szCategory)) continue;
+        if(!HasAccessInItem(iSlot, _item.szCategory, _item.szIdentity)) continue;
         std::string szName = g_pAdminApi->GetTranslation(_item.szName);
         if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
         g_pMenus->AddItemMenu(hMenu, _item.szIdentity, szName.c_str());
