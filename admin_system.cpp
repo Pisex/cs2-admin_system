@@ -1455,7 +1455,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.2.2";
+	return "1.0.2.3";
 }
 
 const char* admin_system::GetDate()

@@ -218,8 +218,8 @@ void ShowUnPunishMenu(int iSlot, int iType)
         if(iItem < 7)
         {
             g_pAdminApi->RemovePlayerPunishment(std::atoi(szBack), iType, iSlot, true);
-            g_pMenus->ClosePlayerMenu(iSlot);
             g_pUtils->PrintToChat(iSlot, g_vecPhrases["UnPunishSuccess"].c_str(), szFront);
+            g_pMenus->ClosePlayerMenu(iSlot);
         }
         else if(iItem == 7)
         {
@@ -317,8 +317,8 @@ void ShowUnPunishOfflineMenu(int iSlot, int iType)
             if(iItem < 7)
             {
                 g_pAdminApi->RemoveOfflinePlayerPunishment(szBack, iType, iSlot);
-                g_pMenus->ClosePlayerMenu(iSlot);
                 g_pUtils->PrintToChat(iSlot, g_vecPhrases["UnPunishOfflineSuccess"].c_str(), szFront);
+                g_pMenus->ClosePlayerMenu(iSlot);
             }
             else if(iItem == 7)
             {
