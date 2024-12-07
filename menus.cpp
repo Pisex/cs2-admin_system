@@ -284,12 +284,12 @@ void OnPunishOfflineSelect(int iSlot, const char* szCategory, const char* szIden
 void ShowUnPunishOfflineMenu(int iSlot, int iType)
 {
     char szQuery[256], szSteamID[64];
-    uint64 iSteamID = g_pPlayers->GetSteamID64(iSlot); 
+    bool bUnpunishAll = g_pAdminApi->HasPermission(iSlot, "@admin/unpunish_all");
     g_SMAPI->Format(szSteamID, sizeof(szSteamID), "admin_id = '%i' AND ", g_pAdmins[iSlot].iID);
     g_SMAPI->Format(szQuery, sizeof(szQuery), 
         "SELECT * FROM %spunishments WHERE %spunish_type = %d AND (expires > %d OR expires = 0) AND unpunish_admin_id IS NULL ORDER BY `id` DESC LIMIT %i",
         g_szDatabasePrefix,
-        g_iUnpunishType == 0?szSteamID:"",
+        g_iUnpunishType == 0 && !bUnpunishAll ?szSteamID:"",
         iType,
         std::time(0),
         g_iUnpunishOfflineCount

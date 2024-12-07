@@ -59,6 +59,8 @@ int g_iPunishOfflineCount = 0;
 int g_iUnpunishType = 0;
 int g_iUnpunishOfflineCount = 0;
 
+bool g_bPunishIP = false;
+
 bool g_bStaticNames = false;
 
 int g_iMessageType;
@@ -650,6 +652,8 @@ void LoadConfig()
 
 	g_iServerID[SID_ADMIN] = pKVConfig->GetInt("admin_server_id", -1);
 	g_iServerID[SID_PUNISH] = pKVConfig->GetInt("punish_server_id", -1);
+
+	g_bPunishIP = pKVConfig->GetBool("punish_ip", false);
 
 	g_iTime_Reason_Type = pKVConfig->GetInt("time_reason_type", 0);
 
@@ -1455,7 +1459,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.2.3";
+	return "1.0.3";
 }
 
 const char* admin_system::GetDate()

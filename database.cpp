@@ -23,6 +23,7 @@ extern IPlayersApi* g_pPlayers;
 extern int g_iBanDelay;
 extern int g_iUnpunishType;
 extern bool g_bStaticNames;
+extern bool g_bPunishIP;
 
 void CreateConnection()
 {
@@ -128,7 +129,7 @@ void CheckPunishments(int iSlot, uint64 xuid)
         g_szDatabasePrefix,
         g_szDatabasePrefix,
         xuid,
-        bIP ? (" OR p.ip = '" + sIp + "'").c_str() : "",
+        g_bPunishIP && bIP ? (" OR p.ip = '" + sIp + "'").c_str() : "",
         g_iServerID[SID_PUNISH] == -1 ? "" : ("AND p.server_id = " + std::to_string(g_iServerID[SID_PUNISH])).c_str()
     );
 
@@ -205,8 +206,8 @@ void CheckPermissions(int iSlot, uint64 xuid)
                     }
                 }
             }
-            g_pAdminApi->OnAdminConnectedSend(iSlot);
             g_pAdmins[iSlot] = hAdmin;
+            g_pAdminApi->OnAdminConnectedSend(iSlot);
         }
     });
 }
@@ -297,6 +298,7 @@ void RemovePunishment(int iSlot, int iType, int iAdminID)
 
 void RemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID)
 {
+    bool bUnpunishAll = g_pAdminApi->HasPermission(iAdminID, "@admin/unpunish_all");
     char szQuery[256];
     char szAdminID[32];
     g_SMAPI->Format(szAdminID, sizeof(szAdminID), " AND admin_id = %d", iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID);
@@ -307,7 +309,7 @@ void RemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID)
         szSteamID64,
         iType,
         std::time(0),
-        g_iUnpunishType == 0 && iAdminID != -1? szAdminID : "",
+        g_iUnpunishType == 0 && iAdminID != -1 && !bUnpunishAll? szAdminID : "",
         g_iServerID[SID_PUNISH]
     );
 
