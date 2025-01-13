@@ -97,6 +97,22 @@ void LoadConfig();
 void LoadSorting();
 void LoadTranslations();
 
+void ResetPunishments(int iSlot)
+{
+	for(int i = 0; i < 4; i++)
+	{
+		g_iPunishments[iSlot][i] = -1;
+		g_szPunishReasons[iSlot][i] = "";
+		g_iAdminPunish[iSlot][i] = 0;
+	}
+	g_pAdmins[iSlot].iID = 0;
+	g_pAdmins[iSlot].iImmunity = 0;
+	g_pAdmins[iSlot].iExpireTime = -1;
+	g_pAdmins[iSlot].vFlags.clear();
+	g_pAdmins[iSlot].vPermissions.clear();
+
+}
+
 void OnReloadPunish(const CCommandContext& context, const CCommand& args)
 {
 	int iAdmin = context.GetPlayerSlot().Get();
@@ -125,7 +141,10 @@ void OnReloadPunish(const CCommandContext& context, const CCommand& args)
             iSlot = i;
         }
     }
-	if(bFound) CheckPunishments(iSlot, std::stoull(args[1]));
+	if(bFound) {
+		ResetPunishments(iSlot);
+		CheckPunishmentsForce(iSlot, std::stoull(args[1]));
+	}
 }
 
 void OnReloadAdmin(const CCommandContext& context, const CCommand& args)
@@ -551,22 +570,6 @@ bool OnHearingClient(int iSlot)
 	return !bMuted;
 }
 
-void ResetPunishments(int iSlot)
-{
-	for(int i = 0; i < 4; i++)
-	{
-		g_iPunishments[iSlot][i] = -1;
-		g_szPunishReasons[iSlot][i] = "";
-		g_iAdminPunish[iSlot][i] = 0;
-	}
-	g_pAdmins[iSlot].iID = 0;
-	g_pAdmins[iSlot].iImmunity = 0;
-	g_pAdmins[iSlot].iExpireTime = -1;
-	g_pAdmins[iSlot].vFlags.clear();
-	g_pAdmins[iSlot].vPermissions.clear();
-
-}
-
 bool admin_system::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen, bool late)
 {
 	PLUGIN_SAVEVARS();
@@ -980,10 +983,7 @@ void admin_system::AllPluginsLoaded()
 	g_pUtils->CreateTimer(1.0f, [](){
 		for (int i = 0; i < 64; i++)
 		{
-			CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
-			if (!pPlayer) continue;
-			CCSPlayerPawn* pPawn = pPlayer->GetPlayerPawn();
-			if (!pPawn) continue;
+			if(g_pPlayers->IsFakeClient(i)) continue;
 			for (int j = 1; j < 4; j++)
 			{
 				if (g_iPunishments[i][j] == -1) continue;
@@ -993,6 +993,7 @@ void admin_system::AllPluginsLoaded()
 					g_iPunishments[i][j] = -1;
 					g_szPunishReasons[i][j] = "";
 					g_pUtils->PrintToChat(i, g_vecPhrases["MuteExpired"].c_str());
+					g_pAdminApi->OnPlayerUnpunishSend(i, j, -1);
 				}
 			}
 
@@ -1459,7 +1460,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.3";
+	return "1.0.3.1";
 }
 
 const char* admin_system::GetDate()

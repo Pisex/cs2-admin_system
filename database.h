@@ -10,6 +10,7 @@ typedef unsigned long long uint64;
 #define SID_PUNISH 1
 
 void CreateConnection();
+void CheckPunishmentsForce(int iSlot, uint64 xuid);
 void CheckPunishments(int iSlot, uint64 xuid);
 void CheckPermissions(int iSlot, uint64 xuid);
 void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB);

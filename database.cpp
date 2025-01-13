@@ -24,6 +24,8 @@ extern int g_iBanDelay;
 extern int g_iUnpunishType;
 extern bool g_bStaticNames;
 extern bool g_bPunishIP;
+extern std::map<std::string, std::string> g_vecPhrases;
+extern int g_iNofityType;
 
 void CreateConnection()
 {
@@ -158,6 +160,161 @@ void CheckPunishments(int iSlot, uint64 xuid)
     });
 }
 
+std::string FormatSeconds(int iTime)
+{
+    if (iTime == 0) return g_vecPhrases["Never"];
+    int iSeconds = iTime;
+    int iDays = iSeconds / 86400;
+    iSeconds %= 86400;
+    int iHours = iSeconds / 3600;
+    iSeconds %= 3600;
+    int iMinutes = iSeconds / 60;
+    iSeconds %= 60;
+
+    std::string parts;
+
+    if (iDays > 0) 
+        parts += std::to_string(iDays) + g_vecPhrases["Days"];
+    if (iHours > 0) 
+        parts += std::to_string(iHours) + g_vecPhrases["Hours"];
+    if (iMinutes > 0)
+        parts += std::to_string(iMinutes) + g_vecPhrases["Minutes"];
+    // if (iSeconds > 0)
+    //     parts += std::to_string(iSeconds) + g_vecPhrases["Seconds"];
+
+    return parts;
+}
+
+void CheckPunishmentsForce(int iSlot, uint64 xuid)
+{
+    bool bIP = true;
+    auto playerNetInfo = engine->GetPlayerNetInfo(iSlot);
+    if (playerNetInfo == nullptr) bIP = false;
+    auto sIp2 = std::string(playerNetInfo->GetAddress());
+    auto sIp = sIp2.substr(0, sIp2.find(":"));
+
+    char szQuery[512];
+    g_SMAPI->Format(szQuery, sizeof(szQuery),
+        "SELECT p.*, a.steamid, a.name, a.id AS admin_steamid FROM %spunishments p LEFT JOIN %sadmins a ON p.admin_id = a.id WHERE (p.steamid = '%llu'%s) AND p.unpunish_admin_id IS NULL %s",
+        g_szDatabasePrefix,
+        g_szDatabasePrefix,
+        xuid,
+        g_bPunishIP && bIP ? (" OR p.ip = '" + sIp + "'").c_str() : "",
+        g_iServerID[SID_PUNISH] == -1 ? "" : ("AND p.server_id = " + std::to_string(g_iServerID[SID_PUNISH])).c_str()
+    );
+
+    g_pConnection->Query(szQuery, [iSlot](ISQLQuery* query) {
+        ISQLResult *result = query->GetResultSet();
+        if (result->GetRowCount() > 0) {
+            while (result->FetchRow()) {
+                int iType = result->GetInt(10);
+                int iCreated = result->GetInt(5);
+                int iExpired = result->GetInt(6);
+                const char* szReason = result->GetString(7);
+                if(iExpired != 0 && iExpired < std::time(0)) continue;
+                
+                if(iType == RT_BAN) {
+                    if(g_iBanDelay > 0) {
+                        
+                        g_pUtils->CreateTimer(g_iBanDelay, [iSlot]() {
+                            engine->DisconnectClient(CPlayerSlot(iSlot), NETWORK_DISCONNECT_KICKBANADDED);
+                            return -1.0f;
+                        });
+                    } else engine->DisconnectClient(CPlayerSlot(iSlot), NETWORK_DISCONNECT_KICKBANADDED);
+                } else {
+                    if(g_iPunishments[iSlot][iType] != 0 && g_iPunishments[iSlot][iType] < iExpired)
+                        g_iPunishments[iSlot][iType] = iExpired;
+
+                    g_szPunishReasons[iSlot][iType] = szReason;
+                    
+                    uint64 adminSteamID = std::stoll(result->GetString(11));
+                    g_iAdminPunish[iSlot][iType] = adminSteamID;
+                }
+                int iTime = iExpired > 0?iExpired-iCreated:0;
+                const char* szAdminName = result->GetString(12);
+                int iAdminID = result->GetInt(13);
+                if(iAdminID == 1) iAdminID = -1;
+                g_pAdminApi->OnPlayerPunishSend(iSlot, iType, iTime, szReason, iAdminID);
+                std::string szMessage = "";
+                switch (iType)
+                {
+                case RT_BAN:
+                    switch (g_iNofityType)
+                    {
+                    case 1:
+                        szMessage = g_vecPhrases["NewBanMessage"];
+                        break;
+                    case 2:
+                        szMessage = g_vecPhrases["NewBanMessageAll"];
+                        break;
+                    }
+                    break;
+                case RT_MUTE:
+                    switch (g_iNofityType)
+                    {
+                    case 1:
+                        szMessage = g_vecPhrases["NewMuteMessage"];
+                        break;
+                    case 2:
+                        szMessage = g_vecPhrases["NewMuteMessageAll"];
+                        break;
+                    }
+                    break;
+                case RT_GAG:
+                    switch (g_iNofityType)
+                    {
+                    case 1:
+                        szMessage = g_vecPhrases["NewGagMessage"];
+                        break;
+                    case 2:
+                        szMessage = g_vecPhrases["NewGagMessageAll"];
+                        break;
+                    }
+                    break;
+                case RT_SILENCE:
+                    switch (g_iNofityType)
+                    {
+                    case 1:
+                        szMessage = g_vecPhrases["NewSilenceMessage"];
+                        break;
+                    case 2:
+                        szMessage = g_vecPhrases["NewSilenceMessageAll"];
+                        break;
+                    }
+                    break;
+                }
+                switch (g_iNofityType)
+                {
+                case 1:
+                    g_pUtils->PrintToChat(iSlot, szMessage.c_str(), FormatSeconds(iTime).c_str(), szReason, iAdminID == -1?"Console":szAdminName);
+                    if(iAdminID != -1)
+                    {
+                        switch (iType)
+                        {
+                        case RT_BAN:
+                            g_pUtils->PrintToChat(iAdminID, g_vecPhrases["NewBanMessageAdmin"].c_str(), engine->GetClientConVarValue(iSlot, "name"), FormatSeconds(iTime).c_str(), szReason);
+                            break;
+                        case RT_MUTE:
+                            g_pUtils->PrintToChat(iAdminID, g_vecPhrases["NewMuteMessageAdmin"].c_str(), engine->GetClientConVarValue(iSlot, "name"), FormatSeconds(iTime).c_str(), szReason);
+                            break;
+                        case RT_GAG:
+                            g_pUtils->PrintToChat(iAdminID, g_vecPhrases["NewGagMessageAdmin"].c_str(), engine->GetClientConVarValue(iSlot, "name"), FormatSeconds(iTime).c_str(), szReason);
+                            break;
+                        case RT_SILENCE:
+                            g_pUtils->PrintToChat(iAdminID, g_vecPhrases["NewSilenceMessageAdmin"].c_str(), engine->GetClientConVarValue(iSlot, "name"), FormatSeconds(iTime).c_str(), szReason);
+                            break;
+                        }
+                    }
+                    break;
+                case 2:
+                    g_pUtils->PrintToChatAll(szMessage.c_str(), iAdminID == -1?"Console":szAdminName, engine->GetClientConVarValue(iSlot, "name"), FormatSeconds(iTime).c_str(), szReason);
+                    break;
+                }
+            }
+        }
+    });
+}
+
 void CheckPermissions(int iSlot, uint64 xuid)
 {
     g_pAdmins[iSlot].iID = 0;
@@ -167,15 +324,12 @@ void CheckPermissions(int iSlot, uint64 xuid)
     g_pAdmins[iSlot].vPermissions.clear();
 
     char szQuery[512];
-    char szServerID[32];
-    g_SMAPI->Format(szServerID, sizeof(szServerID), " AND s.server_id = %d", g_iServerID[SID_ADMIN]);
     g_SMAPI->Format(szQuery, sizeof(szQuery),
-        "SELECT a.id, a.name, s.flags, s.immunity, s.expires, s.group_id, g.name AS group_name, g.flags AS group_flags, g.immunity AS group_immunity FROM %sadmins a LEFT JOIN %sadmins_servers s ON a.id = s.admin_id LEFT JOIN %sgroups g ON s.group_id = g.id WHERE a.steamid = '%llu'%s",
+        "SELECT a.id, a.name, s.flags, s.immunity, s.expires, s.group_id, g.name AS group_name, g.flags AS group_flags, g.immunity AS group_immunity, s.server_id FROM %sadmins a LEFT JOIN %sadmins_servers s ON a.id = s.admin_id LEFT JOIN %sgroups g ON s.group_id = g.id WHERE a.steamid = '%llu'",
         g_szDatabasePrefix,
         g_szDatabasePrefix,
         g_szDatabasePrefix,
-        xuid,
-        g_iServerID[SID_ADMIN] == -1 ? "" : szServerID
+        xuid
     );
     g_pConnection->Query(szQuery, [iSlot](ISQLQuery* query) {
         ISQLResult *result = query->GetResultSet();
@@ -187,6 +341,8 @@ void CheckPermissions(int iSlot, uint64 xuid)
                 hAdmin.szName = result->GetString(1);
                 int iImmunity = result->GetInt(3);
                 int iGroupImmunity = result->IsNull(8) ? 0 : result->GetInt(8);
+                int iServerID = result->GetInt(9);
+                if(g_iServerID[SID_ADMIN] != -1 && iServerID != g_iServerID[SID_ADMIN] && iServerID != -1) continue;
                 if(iGroupImmunity > iImmunity) iImmunity = iGroupImmunity;
                 if(iImmunity > hAdmin.iImmunity) hAdmin.iImmunity = iImmunity;
                 int iExpires = result->GetInt(4);
