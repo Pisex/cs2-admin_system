@@ -108,8 +108,6 @@ void ResetPunishments(int iSlot)
 	g_pAdmins[iSlot].iID = 0;
 	g_pAdmins[iSlot].iImmunity = 0;
 	g_pAdmins[iSlot].iExpireTime = -1;
-	g_pAdmins[iSlot].vFlags.clear();
-	g_pAdmins[iSlot].vPermissions.clear();
 
 }
 
@@ -143,6 +141,8 @@ void OnReloadPunish(const CCommandContext& context, const CCommand& args)
     }
 	if(bFound) {
 		ResetPunishments(iSlot);
+		g_pAdmins[iSlot].vFlags.clear();
+		g_pAdmins[iSlot].vPermissions.clear();
 		CheckPunishmentsForce(iSlot, std::stoull(args[1]));
 	}
 }
@@ -904,6 +904,8 @@ void admin_system::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionRea
 		g_mOfflineUsers.erase(it);
 	}
 	ResetPunishments(iSlot);
+	g_pAdmins[iSlot].vFlags.clear();
+	g_pAdmins[iSlot].vPermissions.clear();
 }
 
 void admin_system::AllPluginsLoaded()
@@ -1360,7 +1362,7 @@ const char* AdminApi::GetFlagName(const char* szFlag)
 	{
 		return g_mFlags[szFlag].szName;
 	}
-	return nullptr;
+	return "";
 }
 
 int AdminApi::GetAdminExpireTime(int iSlot)
@@ -1460,7 +1462,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.3.1";
+	return "1.0.4";
 }
 
 const char* admin_system::GetDate()

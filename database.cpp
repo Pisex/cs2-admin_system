@@ -152,9 +152,12 @@ void CheckPunishments(int iSlot, uint64 xuid)
                     g_iPunishments[iSlot][iType] = iExpired;
 
                 g_szPunishReasons[iSlot][iType] = result->GetString(7);
-                
-                uint64 adminSteamID = std::stoll(result->GetString(11));
-                g_iAdminPunish[iSlot][iType] = adminSteamID;
+                if(result->IsNull(11)) continue;
+                const char* szAdminSteamID = result->GetString(11);
+                if(OnlyDigits(szAdminSteamID)) {
+                    uint64 adminSteamID = std::stoll(szAdminSteamID);
+                    g_iAdminPunish[iSlot][iType] = adminSteamID;
+                }
             }
         }
     });
@@ -189,9 +192,13 @@ void CheckPunishmentsForce(int iSlot, uint64 xuid)
 {
     bool bIP = true;
     auto playerNetInfo = engine->GetPlayerNetInfo(iSlot);
+    std::string sIp;
+    std::string sIp2;
     if (playerNetInfo == nullptr) bIP = false;
-    auto sIp2 = std::string(playerNetInfo->GetAddress());
-    auto sIp = sIp2.substr(0, sIp2.find(":"));
+    else {
+        sIp2 = std::string(playerNetInfo->GetAddress());
+        sIp = sIp2.substr(0, sIp2.find(":"));
+    }
 
     char szQuery[512];
     g_SMAPI->Format(szQuery, sizeof(szQuery),
@@ -227,8 +234,13 @@ void CheckPunishmentsForce(int iSlot, uint64 xuid)
 
                     g_szPunishReasons[iSlot][iType] = szReason;
                     
-                    uint64 adminSteamID = std::stoll(result->GetString(11));
-                    g_iAdminPunish[iSlot][iType] = adminSteamID;
+                    if(!result->IsNull(11)) {
+                        const char* szAdminSteamID = result->GetString(11);
+                        if(OnlyDigits(szAdminSteamID)) {
+                            uint64 adminSteamID = std::stoll(szAdminSteamID);
+                            g_iAdminPunish[iSlot][iType] = adminSteamID;
+                        }
+                    }
                 }
                 int iTime = iExpired > 0?iExpired-iCreated:0;
                 const char* szAdminName = result->GetString(12);
@@ -478,14 +490,16 @@ void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, 
     const char* szSteamID = strdup(szSteamID64);
     bool bFound = false;
     int iSlot = -1;
-    for(int i = 0; i < 64; i++)
-    {
-        CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
-        if(!pPlayer) continue;
-        if(g_pPlayers->GetSteamID64(i) == std::stoull(szSteamID))
+    if(OnlyDigits(szSteamID)) {
+        for(int i = 0; i < 64; i++)
         {
-            bFound = true;
-            iSlot = i;
+            CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
+            if(!pPlayer) continue;
+            if(g_pPlayers->GetSteamID64(i) == std::stoull(szSteamID))
+            {
+                bFound = true;
+                iSlot = i;
+            }
         }
     }
 
@@ -516,7 +530,9 @@ void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, 
                     g_iServerID[SID_ADMIN]
                 );
                 g_pConnection->Query(szQuery, [iSlot, szSteamID](ISQLQuery* query) {
-                    if(iSlot != -1) CheckPermissions(iSlot, std::stoull(szSteamID));
+                    if(iSlot != -1 && OnlyDigits(szSteamID)) {
+                        CheckPermissions(iSlot, std::stoull(szSteamID));
+                    }
                 });
             } else {
                 char szQuery[512];
@@ -551,7 +567,9 @@ void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, 
                                 g_iServerID[SID_ADMIN]
                             );
                             g_pConnection->Query(szQuery, [iSlot, szSteamID](ISQLQuery* query) {
-                                if(iSlot != -1) CheckPermissions(iSlot, std::stoull(szSteamID));
+                                if(iSlot != -1 && OnlyDigits(szSteamID)) {
+                                    CheckPermissions(iSlot, std::stoull(szSteamID));
+                                }
                             });
                         }
                     });
@@ -636,18 +654,19 @@ void RemoveAdmin(const char* szSteamID64, bool bDB)
             }
         });
     }
-
-    for(int i = 0; i < 64; i++)
-    {
-        CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
-        if(!pPlayer) continue;
-        if(g_pPlayers->GetSteamID64(i) == std::stoull(szSteamID64))
+    if(OnlyDigits(szSteamID64)) {
+        for(int i = 0; i < 64; i++)
         {
-            g_pAdmins[i].iID = 0;
-            g_pAdmins[i].iImmunity = 0;
-            g_pAdmins[i].iExpireTime = -1;
-            g_pAdmins[i].vFlags.clear();
-            g_pAdmins[i].vPermissions.clear();
+            CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
+            if(!pPlayer) continue;
+            if(g_pPlayers->GetSteamID64(i) == std::stoull(szSteamID64))
+            {
+                g_pAdmins[i].iID = 0;
+                g_pAdmins[i].iImmunity = 0;
+                g_pAdmins[i].iExpireTime = -1;
+                g_pAdmins[i].vFlags.clear();
+                g_pAdmins[i].vPermissions.clear();
+            }
         }
     }
 }
