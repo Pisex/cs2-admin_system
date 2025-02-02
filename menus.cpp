@@ -166,7 +166,7 @@ void ShowPunishMenu(int iSlot, int iType)
             CCSPlayerPawn* pPawn = pPlayer->GetPlayerPawn();
             if(!pPawn) continue;
             if(g_pAdminApi->IsPlayerPunished(i, iType)) continue;
-            if(!g_pAdminApi->IsAdmin(i)) continue;
+            if(g_pAdminApi->IsAdmin(i)) continue;
             g_pMenus->AddItemMenu(hMenu, std::to_string(i).c_str(), g_pMenus->escapeString(engine->GetClientConVarValue(i, "name")).c_str());
             bFound = true;
         }

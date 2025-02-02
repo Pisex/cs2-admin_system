@@ -1192,7 +1192,7 @@ bool AdminApi::HasFlag(int iSlot, const char* szFlag)
 
 bool AdminApi::IsAdmin(int iSlot)
 {
-	return !g_pAdmins[iSlot].vPermissions.empty();
+	return !g_pAdmins[iSlot].vFlags.empty();
 }
 
 std::vector<std::string> AdminApi::GetPermissionsByFlag(const char* szFlag)
@@ -1462,7 +1462,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.4";
+	return "1.0.4.1";
 }
 
 const char* admin_system::GetDate()

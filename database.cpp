@@ -382,8 +382,11 @@ void CheckPermissions(int iSlot, uint64 xuid)
 
 void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB)
 {
+    uint64 SteamID64 = g_pPlayers->GetSteamID64(iSlot);
+    if(SteamID64 == 0) return;
     if(bDB)
     {
+
         auto playerNetInfo = engine->GetPlayerNetInfo(iSlot);
         bool bIP = false;
         std::string sIp2;
@@ -394,13 +397,12 @@ void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
             sIp2 = std::string(playerNetInfo->GetAddress());
             sIp = sIp2.substr(0, sIp2.find(":"));
         }
-
         char szQuery[512];
         g_SMAPI->Format(szQuery, sizeof(szQuery), 
             "INSERT INTO %spunishments (name, steamid, ip, admin_id, created, expires, reason, server_id, punish_type) VALUES ('%s', '%llu', '%s', %d, %d, %d, '%s', %d, %d)",
             g_szDatabasePrefix,
             engine->GetClientConVarValue(iSlot, "name"),
-            g_pPlayers->GetSteamID64(iSlot),
+            SteamID64,
             bIP?sIp.c_str():"",
             iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID,
             std::time(0),
@@ -414,7 +416,8 @@ void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
     
     g_iPunishments[iSlot][iType] = iTime == 0 ? 0 : std::time(0) + iTime;
     g_szPunishReasons[iSlot][iType] = szReason;
-    g_iAdminPunish[iSlot][iType] = g_pPlayers->GetSteamID64(iAdminID);
+    if(iAdminID != -1) g_iAdminPunish[iSlot][iType] = g_pPlayers->GetSteamID64(iAdminID);
+    else g_iAdminPunish[iSlot][iType] = 0;
     g_pAdminApi->OnPlayerPunishSend(iSlot, iType, iTime, szReason.c_str(), iAdminID);
     if(iType == RT_BAN) {
         if(g_iBanDelay > 0) {
@@ -428,6 +431,7 @@ void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
 
 void AddOfflinePunishment(const char* szSteamID64, const char* szName, int iType, int iTime, std::string szReason, int iAdminID)
 {
+    if(std::stoull(szSteamID64) == 0) return;
     char szQuery[256];
     g_SMAPI->Format(szQuery, sizeof(szQuery), 
         "INSERT INTO %spunishments (name, steamid, admin_id, created, expires, reason, server_id, punish_type) VALUES ('%s', '%s', %d, %d, %d, '%s', %d, %d)",
@@ -448,12 +452,14 @@ void AddOfflinePunishment(const char* szSteamID64, const char* szName, int iType
 
 void RemovePunishment(int iSlot, int iType, int iAdminID)
 {
+    uint64 SteamID64 = g_pPlayers->GetSteamID64(iSlot);
+    if(SteamID64 == 0) return;
     char szQuery[256];
     g_SMAPI->Format(szQuery, sizeof(szQuery), 
         "UPDATE %spunishments SET unpunish_admin_id = %d WHERE steamid = '%llu' AND punish_type = %d AND (expires > %d OR expires = 0) AND server_id = %d",
         g_szDatabasePrefix,
         iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID,
-        g_pPlayers->GetSteamID64(iSlot),
+        SteamID64,
         iType,
         std::time(0),
         g_iServerID[SID_PUNISH]
@@ -470,7 +476,7 @@ void RemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID)
     char szQuery[256];
     char szAdminID[32];
     g_SMAPI->Format(szAdminID, sizeof(szAdminID), " AND admin_id = %d", iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID);
-    g_SMAPI->Format(szQuery, sizeof(szQuery), 
+    g_SMAPI->Format(szQuery, sizeof(szQuery),
         "UPDATE %spunishments SET unpunish_admin_id = %d WHERE steamid = '%s' AND punish_type = %d AND (expires > %d OR expires = 0)%s AND server_id = %d",
         g_szDatabasePrefix,
         iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID,
