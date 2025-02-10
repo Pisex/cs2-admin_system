@@ -17,6 +17,10 @@ void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
 void AddOfflinePunishment(const char* szSteamID64, const char* szName, int iType, int iTime, std::string szReason, int iAdminID);
 void RemovePunishment(int iSlot, int iType, int iAdminID);
 void RemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID);
+void TryAddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB);
+void TryAddOfflinePunishment(const char* szSteamID64, const char* szName, int iType, int iTime, std::string szReason, int iAdminID);
+void TryRemovePunishment(int iSlot, int iType, int iAdminID);
+void TryRemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID);
 void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, int iImmunity, int iTime, int iGroupID, const char* szComment, bool bDB);
 void RemoveAdmin(const char* szSteamID64, bool bDB);
 void AddGroup(int iSlot, const char* szName, const char* szFlags, int iImmunity, bool bConsole);

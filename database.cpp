@@ -26,6 +26,7 @@ extern bool g_bStaticNames;
 extern bool g_bPunishIP;
 extern std::map<std::string, std::string> g_vecPhrases;
 extern int g_iNofityType;
+extern int g_iImmunityType;
 
 void CreateConnection()
 {
@@ -121,9 +122,13 @@ void CheckPunishments(int iSlot, uint64 xuid)
 {
     bool bIP = true;
     auto playerNetInfo = engine->GetPlayerNetInfo(iSlot);
+    std::string sIp;
+    std::string sIp2;
     if (playerNetInfo == nullptr) bIP = false;
-    auto sIp2 = std::string(playerNetInfo->GetAddress());
-    auto sIp = sIp2.substr(0, sIp2.find(":"));
+    else {
+        sIp2 = std::string(playerNetInfo->GetAddress());
+        sIp = sIp2.substr(0, sIp2.find(":"));
+    }
 
     char szQuery[512];
     g_SMAPI->Format(szQuery, sizeof(szQuery),
@@ -348,15 +353,16 @@ void CheckPermissions(int iSlot, uint64 xuid)
         if (result->GetRowCount() > 0) {
             Admin hAdmin;
             hAdmin.iExpireTime = -1;
+            hAdmin.iImmunity = 0;
             while (result->FetchRow()) {
                 hAdmin.iID = result->GetInt(0);
                 hAdmin.szName = result->GetString(1);
                 int iImmunity = result->GetInt(3);
+                if(iImmunity > hAdmin.iImmunity) hAdmin.iImmunity = iImmunity;
                 int iGroupImmunity = result->IsNull(8) ? 0 : result->GetInt(8);
                 int iServerID = result->GetInt(9);
                 if(g_iServerID[SID_ADMIN] != -1 && iServerID != g_iServerID[SID_ADMIN] && iServerID != -1) continue;
-                if(iGroupImmunity > iImmunity) iImmunity = iGroupImmunity;
-                if(iImmunity > hAdmin.iImmunity) hAdmin.iImmunity = iImmunity;
+                if(iGroupImmunity > hAdmin.iImmunity) hAdmin.iImmunity = iGroupImmunity;
                 int iExpires = result->GetInt(4);
                 if((iExpires > hAdmin.iExpireTime || iExpires == 0) && hAdmin.iExpireTime != 0) hAdmin.iExpireTime = iExpires;
                 const char* szFlags = result->GetString(2);
@@ -726,4 +732,87 @@ void RemoveGroup(const char* szIdentifier)
         );
     }
     g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
+}
+
+void TryAddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB)
+{
+    if(iSlot < 0 || iSlot > 64) return;
+    if(g_pAdmins[iSlot].iID > 0 && iAdminID != -1 && g_pAdmins[iSlot].iImmunity > g_pAdmins[iAdminID].iImmunity) return;
+    AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+}
+
+void TryAddOfflinePunishment(const char* szSteamID64, const char* szName, int iType, int iTime, std::string szReason, int iAdminID)
+{
+    if(iAdminID == -1) {
+        AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
+        return;
+    }
+    char szQuery[512], szServerID[32];
+    g_SMAPI->Format(szServerID, sizeof(szServerID), " AND (server_id = %d OR server_id = -1)", g_iServerID[SID_PUNISH]);
+    g_SMAPI->Format(szQuery, sizeof(szQuery), 
+        "SELECT a_s.immunity, g.immunity AS group_immunity FROM %sadmins a\
+        LEFT JOIN %sadmins_servers a_s ON a.id = a_s.admin_id\
+        LEFT JOIN %sgroups g ON a_s.group_id = g.id\
+        WHERE a.steamid = '%s'%s", g_szDatabasePrefix, g_szDatabasePrefix, g_szDatabasePrefix, szSteamID64, g_iServerID[SID_PUNISH] == -1 ? "" : szServerID);
+    g_pConnection->Query(szQuery, [szSteamID64, szName, iType, iTime, szReason, iAdminID](ISQLQuery* query) {
+        ISQLResult *result = query->GetResultSet();
+        if (result->GetRowCount() > 0) {
+            result->FetchRow();
+            int iImmunity = result->GetInt(0);
+            int iGroupImmunity = result->IsNull(1) ? 0 : result->GetInt(1);
+            if(iGroupImmunity > iImmunity) iImmunity = iGroupImmunity;
+            switch (g_iImmunityType)
+            {
+            case 0:
+                AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
+                break;
+            case 1:
+                if(g_pAdmins[iAdminID].iImmunity < iImmunity) return;
+                AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
+                break;
+            case 2:
+                if(g_pAdmins[iAdminID].iImmunity <= iImmunity) return;
+                AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
+                break;
+            case 3:
+                if(iImmunity > 0) return;
+                AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
+                break;
+            }
+        }
+    });
+}
+
+void TryRemovePunishment(int iSlot, int iType, int iAdminID)
+{
+    if(iSlot < 0 || iSlot > 64) return;
+    bool bUnpunishAll = false;
+    uint64 iSteamID = 0;
+    if(iAdminID != -1) bUnpunishAll = true;
+    else {
+        bUnpunishAll = g_pAdminApi->HasPermission(iAdminID, "@admin/unpunish_all");
+        iSteamID = g_pPlayers->GetSteamID64(iAdminID);
+    }
+    if(g_iUnpunishType == 0 && g_iAdminPunish[iSlot][iType] != iSteamID && !bUnpunishAll) return;
+    RemovePunishment(iSlot, iType, iAdminID);
+}
+
+void TryRemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID)
+{
+    if(iAdminID == -1) {
+        RemoveOfflinePunishment(szSteamID64, iType, iAdminID);
+        return;
+    }
+    bool bUnpunishAll = g_pAdminApi->HasPermission(iAdminID, "@admin/unpunish_all");
+    char szQuery[512], szAdminID[32];
+    g_SMAPI->Format(szAdminID, sizeof(szAdminID), " AND admin_id = %d", iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID);
+    g_SMAPI->Format(szQuery, sizeof(szQuery), 
+        "SELECT * FROM %spunishments WHERE steamid = '%s' AND punish_type = %d AND (expires > %d OR expires = 0) AND server_id = %d%s", g_szDatabasePrefix, szSteamID64, iType, std::time(0), g_iServerID[SID_PUNISH], g_iUnpunishType == 0 && iAdminID != -1 && !bUnpunishAll? szAdminID : "");
+    g_pConnection->Query(szQuery, [szSteamID64, iType, iAdminID](ISQLQuery* query) {
+        ISQLResult *result = query->GetResultSet();
+        if (result->GetRowCount() > 0) {
+            result->FetchRow();
+            RemoveOfflinePunishment(szSteamID64, iType, iAdminID);
+        }
+    });
 }

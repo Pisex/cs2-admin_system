@@ -195,6 +195,7 @@ void ShowUnPunishMenu(int iSlot, int iType)
 {
     Menu hMenu;
     g_pMenus->SetTitleMenu(hMenu, g_vecPhrases["SelectPlayer"].c_str());
+    bool bUnpunishAll = g_pAdminApi->HasPermission(iSlot, "@admin/unpunish_all");
     bool bFound = false;
     uint64 iSteamID = g_pPlayers->GetSteamID64(iSlot); 
     for (int i = 0; i < 64; i++)
@@ -204,7 +205,7 @@ void ShowUnPunishMenu(int iSlot, int iType)
         CCSPlayerPawn* pPawn = pPlayer->GetPlayerPawn();
         if(!pPawn) continue;
         if(!g_pAdminApi->IsPlayerPunished(i, iType)) continue;
-        if(g_iUnpunishType == 0 && g_iAdminPunish[i][iType] != iSteamID) continue;
+        if(g_iUnpunishType == 0 && g_iAdminPunish[i][iType] != iSteamID && !bUnpunishAll) continue;
         g_pMenus->AddItemMenu(hMenu, std::to_string(i).c_str(), g_pMenus->escapeString(engine->GetClientConVarValue(i, "name")).c_str());
         bFound = true;
     }

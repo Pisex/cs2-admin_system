@@ -350,7 +350,10 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 {
 	if(iAdmin != -1 && !g_pAdminApi->HasPermission(iAdmin, szFlag))
 	{
-		if(bConsole) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+		if(bConsole) {
+			if(iAdmin == -1) META_CONPRINT("[Admin System] You don't have permission to use this command\n");
+			else g_pUtils->PrintToConsole(iAdmin, "[Admin System] You don't have permission to use this command\n");
+		}
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["NoPermission"].c_str());
 		return;
 	}
@@ -358,8 +361,14 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 	{
 		if(bConsole)
 		{
-			if(UnPunish) META_CONPRINTF("[Admin System] Usage: %s <userid|steamid>\n", args[0]);
-			else META_CONPRINTF("[Admin System] Usage: %s <userid|steamid> <time> <reason>\n", args[0]);
+			if(UnPunish) {
+				if(iAdmin == -1) META_CONPRINTF("[Admin System] Usage: %s <userid|steamid>\n", args[0]);
+				else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Usage: %s <userid|steamid>\n", args[0]);
+			}
+			else {
+				if(iAdmin == -1) META_CONPRINTF("[Admin System] Usage: %s <userid|steamid> <time> <reason>\n", args[0]);
+				else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Usage: %s <userid|steamid> <time> <reason>\n", args[0]);
+			}
 		}
 		else
 		{
@@ -368,26 +377,34 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 		}
 		return;
 	}
+	std::string szReason = args.ArgS();
+    std::string arg1 = args[1];
+    std::string arg2 = args[2];
 	bool bFound = false;
-	CCSPlayerController* pController;
 	int iSlot = 0;
 	for (int i = 0; i < 64; i++)
 	{
-		pController = CCSPlayerController::FromSlot(i);
-		if (!pController) continue;
-		uint m_steamID = pController->m_steamID();
+		if(g_pPlayers->IsFakeClient(i)) continue;
+		uint64 m_steamID = g_pPlayers->GetSteamID64(i);
 		if(m_steamID == 0) continue;
-		if(strcasestr(engine->GetClientConVarValue(i, "name"), args[1]) || (containsOnlyDigits(args[1]) && m_steamID == std::stoll(args[1])) || (containsOnlyDigits(args[1]) && std::stoll(args[1]) == i))
-		{
+		if(containsOnlyDigits(arg1)) {
+			if(arg1.length() <= 2 && atoi(arg1.c_str()) == i)
+			{
+				bFound = true;
+				iSlot = i;
+				break;
+			} else if(m_steamID == std::stoull(arg1)) {
+				bFound = true;
+				iSlot = i;
+				break;
+			}
+		} else if(strcasestr(engine->GetClientConVarValue(i, "name"), args[1])) {
 			bFound = true;
 			iSlot = i;
 			break;
 		}
 	}
 	int iTime = std::atoi(args[2]);
-	std::string szReason = args.ArgS();
-    std::string arg1 = args[1];
-    std::string arg2 = args[2];
     szReason.erase(0, arg1.length() + arg2.length() + 2);
 	if(!bConsole && szReason.length() > 0)
 		szReason.pop_back();
@@ -395,35 +412,50 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 	{
 		if(UnPunish)
 		{
-			RemovePunishment(iSlot, iType, iAdmin);
-			if(bConsole) META_CONPRINT("[Admin System] Player unpunished\n");
+			TryRemovePunishment(iSlot, iType, iAdmin);
+			if(bConsole) {
+				if(iAdmin == -1) META_CONPRINT("[Admin System] Player unpunished\n");
+				else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Player unpunished\n");
+			}
 			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerUnPunished"].c_str());
 		}
 		else
 		{
-			AddPunishment(iSlot, iType, iTime, szReason, iAdmin, true);
-			if(bConsole) META_CONPRINT("[Admin System] Player punished\n");
+			TryAddPunishment(iSlot, iType, iTime, szReason, iAdmin, true);
+			if(bConsole) {
+				if(iAdmin == -1) META_CONPRINT("[Admin System] Player punished\n");
+				else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Player punished\n");
+			}
 			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerPunished"].c_str());
 		}
 	}
-	else if(containsOnlyDigits(args[1]) && arg1.length() >= 17)
+	else if(containsOnlyDigits(arg1) && arg1.length() >= 17)
 	{
 		if(UnPunish)
 		{
-			RemoveOfflinePunishment(strdup(args[1]), iType, iAdmin);
-			if(bConsole) META_CONPRINT("[Admin System] Player unpunished\n");
+			TryRemoveOfflinePunishment(strdup(args[1]), iType, iAdmin);
+			if(bConsole) {
+				if(iAdmin == -1) META_CONPRINT("[Admin System] Player unpunished\n");
+				else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Player unpunished\n");
+			}
 			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerUnPunished"].c_str());
 		}
 		else
 		{
-			AddOfflinePunishment(strdup(args[1]), "undefined", iType, iTime, szReason, iAdmin);
-			if(bConsole) META_CONPRINT("[Admin System] Player punished\n");
+			TryAddOfflinePunishment(strdup(args[1]), "undefined", iType, iTime, szReason, iAdmin);
+			if(bConsole) {
+				if(iAdmin == -1) META_CONPRINT("[Admin System] Player punished\n");
+				else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Player punished\n");
+			}
 			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerPunished"].c_str());
 		}
 	}
 	else
 	{
-		if(bConsole) META_CONPRINT("[Admin System] Player not found\n");
+		if(bConsole) {
+			if(iAdmin == -1) META_CONPRINT("[Admin System] Player not found\n");
+			else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Player not found\n");
+		}
 		else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerNotFound"].c_str());
 	}
 }
@@ -1462,7 +1494,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.4.1";
+	return "1.0.5";
 }
 
 const char* admin_system::GetDate()
