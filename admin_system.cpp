@@ -532,6 +532,8 @@ void StartupServer()
 	g_pGameEntitySystem = GameEntitySystem();
 	g_pEntitySystem = g_pUtils->GetCEntitySystem();
 	gpGlobals = g_pUtils->GetCGlobalVars();
+
+	if(g_pConnection) RemoveExpiresAdmins();
 }
 
 std::vector<std::string> GetPermissionsByFlag(const char* szFlag)
@@ -1494,7 +1496,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.5";
+	return "1.0.6";
 }
 
 const char* admin_system::GetDate()

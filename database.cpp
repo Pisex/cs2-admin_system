@@ -132,18 +132,20 @@ void CheckPunishments(int iSlot, uint64 xuid)
 
     char szQuery[512];
     g_SMAPI->Format(szQuery, sizeof(szQuery),
-        "SELECT p.*, a.steamid AS admin_steamid FROM %spunishments p LEFT JOIN %sadmins a ON p.admin_id = a.id WHERE (p.steamid = '%llu'%s) AND p.unpunish_admin_id IS NULL %s",
+        "SELECT p.*, a.steamid AS admin_steamid FROM %spunishments p LEFT JOIN %sadmins a ON p.admin_id = a.id WHERE (p.steamid = '%llu'%s) AND p.unpunish_admin_id IS NULL",
         g_szDatabasePrefix,
         g_szDatabasePrefix,
         xuid,
-        g_bPunishIP && bIP ? (" OR p.ip = '" + sIp + "'").c_str() : "",
-        g_iServerID[SID_PUNISH] == -1 ? "" : ("AND p.server_id = " + std::to_string(g_iServerID[SID_PUNISH])).c_str()
+        g_bPunishIP && bIP ? (" OR p.ip = '" + sIp + "'").c_str() : ""
     );
 
     g_pConnection->Query(szQuery, [iSlot](ISQLQuery* query) {
         ISQLResult *result = query->GetResultSet();
         if (result->GetRowCount() > 0) {
             while (result->FetchRow()) {
+                int serverID = result->GetInt(9);
+                if (serverID != -1 && serverID != g_iServerID[SID_PUNISH]) continue;
+
                 int iType = result->GetInt(10);
                 int iExpired = result->GetInt(6);
                 if(iExpired != 0 && iExpired < std::time(0)) continue;
@@ -211,14 +213,15 @@ void CheckPunishmentsForce(int iSlot, uint64 xuid)
         g_szDatabasePrefix,
         g_szDatabasePrefix,
         xuid,
-        g_bPunishIP && bIP ? (" OR p.ip = '" + sIp + "'").c_str() : "",
-        g_iServerID[SID_PUNISH] == -1 ? "" : ("AND p.server_id = " + std::to_string(g_iServerID[SID_PUNISH])).c_str()
+        g_bPunishIP && bIP ? (" OR p.ip = '" + sIp + "'").c_str() : ""
     );
 
     g_pConnection->Query(szQuery, [iSlot](ISQLQuery* query) {
         ISQLResult *result = query->GetResultSet();
         if (result->GetRowCount() > 0) {
             while (result->FetchRow()) {
+                int serverID = result->GetInt(9);
+                if (serverID != -1 && serverID != g_iServerID[SID_PUNISH]) continue;
                 int iType = result->GetInt(10);
                 int iCreated = result->GetInt(5);
                 int iExpired = result->GetInt(6);
@@ -813,6 +816,35 @@ void TryRemoveOfflinePunishment(const char* szSteamID64, int iType, int iAdminID
         if (result->GetRowCount() > 0) {
             result->FetchRow();
             RemoveOfflinePunishment(szSteamID64, iType, iAdminID);
+        }
+    });
+}
+
+void RemoveExpiresAdmins()
+{
+    char szQuery[512];
+    g_SMAPI->Format(szQuery, sizeof(szQuery), 
+        "SELECT a.id, a.steamid, a.name, s.flags, s.immunity, s.expires, s.group_id, g.name AS group_name, g.flags AS group_flags, g.immunity AS group_immunity, s.server_id FROM %sadmins a LEFT JOIN %sadmins_servers s ON a.id = s.admin_id LEFT JOIN %sgroups g ON s.group_id = g.id WHERE s.expires > 0 AND s.expires < %d",
+        g_szDatabasePrefix,
+        g_szDatabasePrefix,
+        g_szDatabasePrefix,
+        std::time(0)
+    );
+    g_pConnection->Query(szQuery, [](ISQLQuery* query) {
+        ISQLResult *result = query->GetResultSet();
+        if (result->GetRowCount() > 0) {
+            while (result->FetchRow()) {
+                int iAdminID = result->GetInt(0);
+                int iServerID = result->GetInt(10);
+                char szQuery[512];
+                g_SMAPI->Format(szQuery, sizeof(szQuery), 
+                    "DELETE FROM %sadmins_servers WHERE admin_id = %d AND server_id = %d",
+                    g_szDatabasePrefix,
+                    iAdminID,
+                    iServerID
+                );
+                g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
+            }
         }
     });
 }
