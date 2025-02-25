@@ -209,7 +209,7 @@ void CheckPunishmentsForce(int iSlot, uint64 xuid)
 
     char szQuery[512];
     g_SMAPI->Format(szQuery, sizeof(szQuery),
-        "SELECT p.*, a.steamid, a.name, a.id AS admin_steamid FROM %spunishments p LEFT JOIN %sadmins a ON p.admin_id = a.id WHERE (p.steamid = '%llu'%s) AND p.unpunish_admin_id IS NULL %s",
+        "SELECT p.*, a.steamid, a.name, a.id AS admin_steamid FROM %spunishments p LEFT JOIN %sadmins a ON p.admin_id = a.id WHERE (p.steamid = '%llu'%s) AND p.unpunish_admin_id IS NULL",
         g_szDatabasePrefix,
         g_szDatabasePrefix,
         xuid,
