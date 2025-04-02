@@ -49,9 +49,9 @@ int g_iBanDelay;
 int g_iTime_Reason_Type;
 //if time_reason_type = 0
 std::vector<std::string> g_vReasons[4];
-std::map<int, std::string> g_mTimes[4];
+std::unordered_map<int, std::string> g_mTimes[4];
 //if time_reason_type = 1
-std::map<std::string, std::map<int, std::string>> g_mReasons[4];
+std::vector<std::pair<std::string, std::vector<std::pair<int, std::string>>>> g_mReasons[4];
 
 int g_iNofityType = 0;
 int g_iImmunityType = 0;
@@ -67,7 +67,7 @@ int g_iMessageType;
 
 std::vector<std::string> g_vecDefaultFlags;
 
-std::map<uint64, OfflineUser> g_mOfflineUsers;
+std::unordered_map<uint64, OfflineUser> g_mOfflineUsers;
 
 SH_DECL_HOOK6(IServerGameClients, ClientConnect, SH_NOATTRIB, 0, bool, CPlayerSlot, const char*, uint64, const char *, bool, CBufferString *);
 SH_DECL_HOOK5_void(IServerGameClients, ClientDisconnect, SH_NOATTRIB, 0, CPlayerSlot, ENetworkDisconnectionReason, const char *, uint64, const char *);
@@ -750,10 +750,13 @@ void LoadConfig()
 				FOR_EACH_SUBKEY(pKVBan, pKVTime)
 				{
 					const char* szReason = pKVTime->GetName();
+					std::vector<std::pair<int, std::string>> times;
 					FOR_EACH_VALUE(pKVTime, pKVTimeValue)
 					{
-						g_mReasons[RT_BAN][szReason][std::atoi(pKVTimeValue->GetName())] = pKVTimeValue->GetString(nullptr);
+						times.emplace_back(std::atoi(pKVTimeValue->GetName()), pKVTimeValue->GetString(nullptr));
 					}
+
+					g_mReasons[RT_BAN].emplace_back(szReason, std::move(times));
 				}
 			}
 
@@ -763,10 +766,13 @@ void LoadConfig()
 				FOR_EACH_SUBKEY(pKVMute, pKVTime)
 				{
 					const char* szReason = pKVTime->GetName();
+					std::vector<std::pair<int, std::string>> times;
 					FOR_EACH_VALUE(pKVTime, pKVTimeValue)
 					{
-						g_mReasons[RT_MUTE][szReason][std::atoi(pKVTimeValue->GetName())] = pKVTimeValue->GetString(nullptr);
+						times.emplace_back(std::atoi(pKVTimeValue->GetName()), pKVTimeValue->GetString(nullptr));
 					}
+
+					g_mReasons[RT_MUTE].emplace_back(szReason, std::move(times));
 				}
 			}
 
@@ -776,10 +782,13 @@ void LoadConfig()
 				FOR_EACH_SUBKEY(pKVGag, pKVTime)
 				{
 					const char* szReason = pKVTime->GetName();
+					std::vector<std::pair<int, std::string>> times;
 					FOR_EACH_VALUE(pKVTime, pKVTimeValue)
 					{
-						g_mReasons[RT_GAG][szReason][std::atoi(pKVTimeValue->GetName())] = pKVTimeValue->GetString(nullptr);
+						times.emplace_back(std::atoi(pKVTimeValue->GetName()), pKVTimeValue->GetString(nullptr));
 					}
+
+					g_mReasons[RT_GAG].emplace_back(szReason, std::move(times));
 				}
 			}
 
@@ -789,10 +798,13 @@ void LoadConfig()
 				FOR_EACH_SUBKEY(pKVSilence, pKVTime)
 				{
 					const char* szReason = pKVTime->GetName();
+					std::vector<std::pair<int, std::string>> times;
 					FOR_EACH_VALUE(pKVTime, pKVTimeValue)
 					{
-						g_mReasons[RT_SILENCE][szReason][std::atoi(pKVTimeValue->GetName())] = pKVTimeValue->GetString(nullptr);
+						times.emplace_back(std::atoi(pKVTimeValue->GetName()), pKVTimeValue->GetString(nullptr));
 					}
+
+					g_mReasons[RT_SILENCE].emplace_back(szReason, std::move(times));
 				}
 			}
 		}
@@ -898,6 +910,7 @@ bool OnChatPre(int iSlot, const char* szContent, bool bTeam)
 	if(IsClientGaggedOrSilenced(iSlot))
 	{
 		if(strstr(szContent, "!") || strstr(szContent, "/") || !strcmp(szContent, "\"\"")) return false;
+		// if(szContent[1] == '!' || szContent[1] == '/') return true;
 		int iType = g_iPunishments[iSlot][RT_GAG] != -1 ? RT_GAG : RT_SILENCE;
 		g_pUtils->PrintToChat(iSlot, g_vecPhrases["MuteActiveChat"].c_str(), g_szPunishReasons[iSlot][iType].c_str(), FormatTime(g_iPunishments[iSlot][iType]).c_str());
 		return false;
@@ -1352,12 +1365,12 @@ void AdminApi::AddPlayerPunishment(int iSlot, int iType, int iTime, const char* 
 {
 	int iTimeExpire = iTime == 0 ? 0 : std::time(nullptr) + iTime;
 	if(bNotify) SendPunishmentNotification(iSlot, iType, iTimeExpire, szReason, iAdminID);
-	AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+	TryAddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
 }
 
 void AdminApi::AddOfflinePlayerPunishment(const char* szSteamID64, const char* szName, int iType, int iTime, const char* szReason, int iAdminID)
 {
-	AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
+	TryAddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
 }
 
 void AdminApi::RemovePlayerPunishment(int iSlot, int iType, int iAdminID, bool bNotify)
@@ -1382,12 +1395,12 @@ void AdminApi::RemovePlayerPunishment(int iSlot, int iType, int iAdminID, bool b
 		}
 		g_pUtils->PrintToChatAll(szMessage.c_str(), iAdminID == -1?"Console":engine->GetClientConVarValue(iAdminID, "name"), engine->GetClientConVarValue(iSlot, "name"));
 	}
-	RemovePunishment(iSlot, iType, iAdminID);
+	TryRemovePunishment(iSlot, iType, iAdminID);
 }
 
 void AdminApi::RemoveOfflinePlayerPunishment(const char* szSteamID64, int iType, int iAdminID)
 {
-	RemoveOfflinePunishment(szSteamID64, iType, iAdminID);
+	TryRemoveOfflinePunishment(szSteamID64, iType, iAdminID);
 }
 
 const char* AdminApi::GetFlagName(const char* szFlag)
@@ -1496,7 +1509,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.6.1";
+	return "1.0.6.2";
 }
 
 const char* admin_system::GetDate()

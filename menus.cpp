@@ -27,11 +27,11 @@ extern uint64 g_iAdminPunish[64][4];
 
 //if g_iTime_Reason_Type = 0
 extern std::vector<std::string> g_vReasons[4];
-extern std::map<int, std::string> g_mTimes[4];
+extern std::unordered_map<int, std::string> g_mTimes[4];
 //if g_iTime_Reason_Type = 1
-extern std::map<std::string, std::map<int, std::string>> g_mReasons[4];
+extern std::vector<std::pair<std::string, std::vector<std::pair<int, std::string>>>> g_mReasons[4];;
 
-extern std::map<uint64, OfflineUser> g_mOfflineUsers;
+extern std::unordered_map<uint64, OfflineUser> g_mOfflineUsers;
 
 extern std::map<std::string, std::vector<std::string>> g_mSortItems;
 extern std::vector<std::string> g_vSortCategories;
@@ -47,8 +47,13 @@ void ShowTimesMenu(int iSlot, uint64 iTarget, int iType, std::string szReason, b
     g_pMenus->SetTitleMenu(hMenu, g_vecPhrases["SelectTime"].c_str());
     if(g_iTime_Reason_Type)
     {
-        for (const auto& time : g_mReasons[iType][szReason]) {
-            g_pMenus->AddItemMenu(hMenu, std::to_string(time.first).c_str(), time.second.c_str());
+        for (const auto& reason : g_mReasons[iType]) {
+            if (reason.first == szReason) {
+                for (const auto& time : reason.second) {
+                    g_pMenus->AddItemMenu(hMenu, std::to_string(time.first).c_str(), time.second.c_str());
+                }
+                break;
+            }
         }
     }
     else

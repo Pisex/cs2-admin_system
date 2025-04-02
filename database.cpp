@@ -740,8 +740,25 @@ void RemoveGroup(const char* szIdentifier)
 void TryAddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB)
 {
     if(iSlot < 0 || iSlot > 64) return;
-    if(g_pAdmins[iSlot].iID > 0 && iAdminID != -1 && g_pAdmins[iSlot].iImmunity > g_pAdmins[iAdminID].iImmunity) return;
-    AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+    if(g_pAdmins[iSlot].iID > 0 && iAdminID != -1) return;
+    switch (g_iImmunityType)
+    {
+    case 0:
+        AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+        break;
+    case 1:
+        if(g_pAdmins[iAdminID].iImmunity < g_pAdmins[iSlot].iImmunity) return;
+        AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+        break;
+    case 2:
+        if(g_pAdmins[iAdminID].iImmunity <= g_pAdmins[iSlot].iImmunity) return;
+        AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+        break;
+    case 3:
+        if(g_pAdmins[iSlot].iImmunity > 0) return;
+        AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+        break;
+    }
 }
 
 void TryAddOfflinePunishment(const char* szSteamID64, const char* szName, int iType, int iTime, std::string szReason, int iAdminID)
