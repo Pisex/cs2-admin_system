@@ -375,6 +375,9 @@ void CheckPermissions(int iSlot, uint64 xuid)
                     hAdmin.vFlags.push_back(std::string(1, szFlags[i]));
                 }
                 if(!result->IsNull(5) && result->GetInt(5) != 0) {
+                    int iGroupID = result->GetInt(5);
+                    hAdmin.iGroup = iGroupID;
+                    hAdmin.szGroupName = result->GetString(6);
                     const char* szGroupFlags = result->GetString(7);
                     for (size_t i = 0; i < strlen(szGroupFlags); i++) {
                         std::vector<std::string> vGroupPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szGroupFlags[i]).c_str());
@@ -389,13 +392,13 @@ void CheckPermissions(int iSlot, uint64 xuid)
     });
 }
 
-void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB)
+bool AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB)
 {
+    if(g_pAdminApi->OnPlayerPunishPreSend(iSlot, iType, iTime, szReason.c_str(), iAdminID)) return false;
     uint64 SteamID64 = g_pPlayers->GetSteamID64(iSlot);
-    if(SteamID64 == 0) return;
+    if(SteamID64 == 0) return false;
     if(bDB)
     {
-
         auto playerNetInfo = engine->GetPlayerNetInfo(iSlot);
         bool bIP = false;
         std::string sIp2;
@@ -410,7 +413,7 @@ void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
         g_SMAPI->Format(szQuery, sizeof(szQuery), 
             "INSERT INTO %spunishments (name, steamid, ip, admin_id, created, expires, reason, server_id, punish_type) VALUES ('%s', '%llu', '%s', %d, %d, %d, '%s', %d, %d)",
             g_szDatabasePrefix,
-            engine->GetClientConVarValue(iSlot, "name"),
+            g_pConnection->Escape(engine->GetClientConVarValue(iSlot, "name")).c_str(),
             SteamID64,
             bIP?sIp.c_str():"",
             iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID,
@@ -436,16 +439,18 @@ void AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
             });
         } else engine->DisconnectClient(CPlayerSlot(iSlot), NETWORK_DISCONNECT_KICKBANADDED);
     }
+    return true;
 }
 
 void AddOfflinePunishment(const char* szSteamID64, const char* szName, int iType, int iTime, std::string szReason, int iAdminID)
 {
-    if(std::stoull(szSteamID64) == 0) return;
+    if(!szSteamID64 || strlen(szSteamID64) == 0) return;
+    if(g_pAdminApi->OnOfflinePlayerPunishPreSend(szSteamID64, szName, iType, iTime, szReason.c_str(), iAdminID)) return;
     char szQuery[256];
     g_SMAPI->Format(szQuery, sizeof(szQuery), 
         "INSERT INTO %spunishments (name, steamid, admin_id, created, expires, reason, server_id, punish_type) VALUES ('%s', '%s', %d, %d, %d, '%s', %d, %d)",
         g_szDatabasePrefix,
-        szName,
+        g_pConnection->Escape(szName).c_str(),
         szSteamID64,
         iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID,
         std::time(0),
@@ -554,7 +559,7 @@ void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, 
                 g_SMAPI->Format(szQuery, sizeof(szQuery), 
                     "INSERT INTO %sadmins (name, steamid, comment) VALUES ('%s', '%s', '%s')",
                     g_szDatabasePrefix,
-                    szName,
+                    g_pConnection->Escape(szName).c_str(),
                     szSteamID,
                     szComment
                 );
@@ -617,6 +622,8 @@ void AddAdmin(const char* szName, const char* szSteamID64, const char* szFlags, 
             g_pConnection->Query(szQuery, [iSlot](ISQLQuery* query) {
                 ISQLResult *result = query->GetResultSet();
                 if (result->GetRowCount() > 0) {
+                    g_pAdmins[iSlot].iGroup = result->GetInt(0);
+                    g_pAdmins[iSlot].szGroupName = result->GetString(1);
                     result->FetchRow();
                     int iImmunity = result->GetInt(3);
                     if(iImmunity > g_pAdmins[iSlot].iImmunity) g_pAdmins[iSlot].iImmunity = iImmunity;
@@ -737,28 +744,28 @@ void RemoveGroup(const char* szIdentifier)
     g_pConnection->Query(szQuery, [](ISQLQuery* query) {});
 }
 
-void TryAddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB)
+bool TryAddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iAdminID, bool bDB)
 {
-    if(iSlot < 0 || iSlot > 64) return;
-    if(g_pAdmins[iSlot].iID > 0 && iAdminID != -1) return;
+    if(iSlot < 0 || iSlot > 64) return false;
     switch (g_iImmunityType)
     {
     case 0:
-        AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+        return AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
         break;
     case 1:
-        if(g_pAdmins[iAdminID].iImmunity < g_pAdmins[iSlot].iImmunity) return;
-        AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+        if(g_pAdmins[iAdminID].iImmunity < g_pAdmins[iSlot].iImmunity) return false;
+        return AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
         break;
     case 2:
-        if(g_pAdmins[iAdminID].iImmunity <= g_pAdmins[iSlot].iImmunity) return;
-        AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+        if(g_pAdmins[iAdminID].iImmunity <= g_pAdmins[iSlot].iImmunity) return false;
+        return AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
         break;
     case 3:
-        if(g_pAdmins[iSlot].iImmunity > 0) return;
-        AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+        if(g_pAdmins[iSlot].iImmunity > 0) return false;
+        return AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
         break;
     }
+    return true;
 }
 
 void TryAddOfflinePunishment(const char* szSteamID64, const char* szName, int iType, int iTime, std::string szReason, int iAdminID)
@@ -767,7 +774,7 @@ void TryAddOfflinePunishment(const char* szSteamID64, const char* szName, int iT
         AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
         return;
     }
-    char szQuery[512], szServerID[32];
+    char szQuery[1024], szServerID[64];
     g_SMAPI->Format(szServerID, sizeof(szServerID), " AND (server_id = %d OR server_id = -1)", g_iServerID[SID_PUNISH]);
     g_SMAPI->Format(szQuery, sizeof(szQuery), 
         "SELECT a_s.immunity, g.immunity AS group_immunity FROM %sadmins a\
@@ -799,6 +806,8 @@ void TryAddOfflinePunishment(const char* szSteamID64, const char* szName, int iT
                 AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
                 break;
             }
+        } else {
+            AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
         }
     });
 }

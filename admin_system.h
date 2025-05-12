@@ -33,6 +33,8 @@ struct Admin
     std::vector<std::string> vFlags;
     std::vector<std::string> vPermissions;
 	std::string szName;
+	int iGroup;
+	std::string szGroupName;
 };
 
 extern std::unordered_map<std::string, Category> mCategories;
@@ -90,19 +92,37 @@ public:
 	void OnPlayerPunish(SourceMM::PluginId id, OnPlayerPunishCallback callback) override {
 		mOnPlayerPunish[id] = callback;
 	}
+	void OnPlayerPunishPre(SourceMM::PluginId id, OnPlayerPunishCallbackPre callback) {
+		mOnPlayerPunishPre[id] = callback;
+	}
 	void OnPlayerPunishSend(int iSlot, int iType, int iTime, const char* szReason, int iAdminID) {
 		for (auto& it : mOnPlayerPunish) {
 			it.second(iSlot, iType, iTime, szReason, iAdminID);
 		}
 	}
+	bool OnPlayerPunishPreSend(int iSlot, int iType, int iTime, const char* szReason, int iAdminID) {
+		for (auto& it : mOnPlayerPunishPre) {
+			if (it.second(iSlot, iType, iTime, szReason, iAdminID)) return true;
+		}
+		return false;
+	}
 	void AddOfflinePlayerPunishment(const char* szSteamID64, const char* szName, int iType, int iTime, const char* szReason, int iAdminID);
 	void OnOfflinePlayerPunish(SourceMM::PluginId id, OnOfflinePlayerPunishCallback callback) override {
 		mOnOfflinePlayerPunish[id] = callback;
+	}
+	void OnOfflinePlayerPunishPre(SourceMM::PluginId id, OnOfflinePlayerPunishCallbackPre callback) {
+		mOnOfflinePlayerPunishPre[id] = callback;
 	}
 	void OnOfflinePlayerPunishSend(const char* szSteamID64, const char* szName, int iType, int iTime, const char* szReason, int iAdminID) {
 		for (auto& it : mOnOfflinePlayerPunish) {
 			it.second(szSteamID64, szName, iType, iTime, szReason, iAdminID);
 		}
+	}
+	bool OnOfflinePlayerPunishPreSend(const char* szSteamID64, const char* szName, int iType, int iTime, const char* szReason, int iAdminID) {
+		for (auto& it : mOnOfflinePlayerPunishPre) {
+			if (it.second(szSteamID64, szName, iType, iTime, szReason, iAdminID)) return true;
+		}
+		return false;
 	}
 	void RemovePlayerPunishment(int iSlot, int iType, int iAdminID, bool bNotify);
 	void RemoveOfflinePlayerPunishment(const char* szSteamID64, int iType, int iAdminID);
@@ -122,6 +142,10 @@ public:
 			it.second(szSteamID64, iType, iAdminID);
 		}
 	}
+	const char* GetAdminName(int iSlot);
+    int GetAdminGroupID(int iSlot);
+    const char* GetAdminGroupName(int iSlot);
+    int GetImmunityType();
 	const char* GetFlagName(const char* szFlag);
 	int GetAdminExpireTime(int iSlot);
 	void ShowAdminMenu(int iSlot);
@@ -175,6 +199,8 @@ private:
 	std::map<int, OnAdminConnectedCallback> mOnAdminConnected;
 	std::map<int, OnPlayerPunishCallback> mOnPlayerPunish;
 	std::map<int, OnOfflinePlayerPunishCallback> mOnOfflinePlayerPunish;
+	std::map<int, OnPlayerPunishCallbackPre> mOnPlayerPunishPre;
+	std::map<int, OnOfflinePlayerPunishCallbackPre> mOnOfflinePlayerPunishPre;
 	std::map<int, OnPlayerUnpunishCallback> mOnPlayerUnpunish;
 	std::map<int, OnOfflinePlayerUnpunishCallback> mOnOfflinePlayerUnpunish;
 	std::map<int, OnCoreLoadedCallback> mOnCoreLoaded;

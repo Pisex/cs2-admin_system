@@ -24,6 +24,8 @@ typedef std::function<void(const char* szSteamID64, int iType, int iAdminID)> On
 typedef std::function<void()> OnCoreLoadedCallback;
 typedef std::function<void(const char* szCategory)> OnCategoryRegisterCallback;
 typedef std::function<void(int iSlot, const char* szAction, const char* szParam)> OnActionCallback;
+typedef std::function<bool(int iSlot, int iType, int iTime, const char* szReason, int iAdminID)> OnPlayerPunishCallbackPre;
+typedef std::function<bool(const char* szSteamID64, const char* szName, int iType, int iTime, const char* szReason, int iAdminID)> OnOfflinePlayerPunishCallbackPre;
 
 #define Admin_INTERFACE "IAdminApi"
 
@@ -74,4 +76,10 @@ public:
     virtual void SendAction(int iSlot, const char* szAction, const char* szParam) = 0;
     virtual void OnAction(SourceMM::PluginId id, OnActionCallback callback) = 0;
     virtual int GetMessageType() = 0;
+    virtual void OnPlayerPunishPre(SourceMM::PluginId id, OnPlayerPunishCallbackPre callback) = 0;
+    virtual void OnOfflinePlayerPunishPre(SourceMM::PluginId id, OnOfflinePlayerPunishCallbackPre callback) = 0;
+    virtual const char* GetAdminName(int iSlot) = 0;
+    virtual int GetAdminGroupID(int iSlot) = 0;
+    virtual const char* GetAdminGroupName(int iSlot) = 0;
+    virtual int GetImmunityType() = 0;
 };

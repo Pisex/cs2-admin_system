@@ -31,7 +31,7 @@ extern std::unordered_map<int, std::string> g_mTimes[4];
 //if g_iTime_Reason_Type = 1
 extern std::vector<std::pair<std::string, std::vector<std::pair<int, std::string>>>> g_mReasons[4];;
 
-extern std::unordered_map<uint64, OfflineUser> g_mOfflineUsers;
+extern std::vector<std::pair<uint64, OfflineUser>> g_mOfflineUsers;
 
 extern std::map<std::string, std::vector<std::string>> g_mSortItems;
 extern std::vector<std::string> g_vSortCategories;
@@ -69,9 +69,16 @@ void ShowTimesMenu(int iSlot, uint64 iTarget, int iType, std::string szReason, b
         {
             if(bOffline)
             {
-                g_mOfflineUsers[iTarget].bPunished[iType] = true;
-                g_mOfflineUsers[iTarget].iAdminID[iType] = g_pPlayers->GetSteamID64(iSlot);
-                g_pAdminApi->AddOfflinePlayerPunishment(std::to_string(iTarget).c_str(), g_mOfflineUsers[iTarget].szName.c_str(), iType, std::atoi(szBack), szReason.c_str(), iSlot);
+                auto it = std::find_if(g_mOfflineUsers.begin(), g_mOfflineUsers.end(), [iTarget](const std::pair<uint64, OfflineUser>& p) {
+                    return p.first == iTarget;
+                });
+                std::string szName = "";
+                if(it != g_mOfflineUsers.end()) {
+                    it->second.bPunished[iType] = true;
+                    it->second.iAdminID[iType] = g_pPlayers->GetSteamID64(iSlot);
+                    szName = it->second.szName;
+                }
+                g_pAdminApi->AddOfflinePlayerPunishment(std::to_string(iTarget).c_str(), szName.c_str(), iType, std::atoi(szBack), szReason.c_str(), iSlot);
             }
             else
                 g_pAdminApi->AddPlayerPunishment(iTarget, iType, std::atoi(szBack), szReason.c_str(), iSlot, true, true);

@@ -67,7 +67,7 @@ int g_iMessageType;
 
 std::vector<std::string> g_vecDefaultFlags;
 
-std::unordered_map<uint64, OfflineUser> g_mOfflineUsers;
+std::vector<std::pair<uint64, OfflineUser>> g_mOfflineUsers;
 
 SH_DECL_HOOK6(IServerGameClients, ClientConnect, SH_NOATTRIB, 0, bool, CPlayerSlot, const char*, uint64, const char *, bool, CBufferString *);
 SH_DECL_HOOK5_void(IServerGameClients, ClientDisconnect, SH_NOATTRIB, 0, CPlayerSlot, ENetworkDisconnectionReason, const char *, uint64, const char *);
@@ -421,12 +421,14 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 		}
 		else
 		{
-			TryAddPunishment(iSlot, iType, iTime, szReason, iAdmin, true);
-			if(bConsole) {
-				if(iAdmin == -1) META_CONPRINT("[Admin System] Player punished\n");
-				else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Player punished\n");
+			if(TryAddPunishment(iSlot, iType, iTime, szReason, iAdmin, true))
+			{
+				if(bConsole) {
+					if(iAdmin == -1) META_CONPRINT("[Admin System] Player punished\n");
+					else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Player punished\n");
+				}
+				else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerPunished"].c_str());
 			}
-			else g_pUtils->PrintToChat(iAdmin, g_vecPhrases["PlayerPunished"].c_str());
 		}
 	}
 	else if(containsOnlyDigits(arg1) && arg1.length() >= 17)
@@ -920,8 +922,12 @@ bool OnChatPre(int iSlot, const char* szContent, bool bTeam)
 
 void OnClientAuthorized(int iSlot, uint64 xuid)
 {
-	if(g_mOfflineUsers.find(xuid) != g_mOfflineUsers.end())
-		g_mOfflineUsers.erase(xuid);
+	auto it = std::find_if(g_mOfflineUsers.begin(), g_mOfflineUsers.end(), [xuid](const std::pair<uint64, OfflineUser>& p) {
+        return p.first == xuid;
+    });
+	if(it != g_mOfflineUsers.end())
+		g_mOfflineUsers.erase(it);
+
 	CheckPunishments(iSlot, xuid);
 	CheckPermissions(iSlot, xuid);
 }
@@ -944,11 +950,10 @@ void admin_system::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionRea
 	{
 		user.iAdminID[i] = g_iAdminPunish[iSlot][i];
 	}
-	g_mOfflineUsers[xuid] = user;
+	g_mOfflineUsers.emplace_back(xuid, user);
 	if(g_mOfflineUsers.size() > g_iPunishOfflineCount)
 	{
-		auto it = g_mOfflineUsers.begin();
-		g_mOfflineUsers.erase(it);
+		g_mOfflineUsers.erase(g_mOfflineUsers.begin());
 	}
 	ResetPunishments(iSlot);
 	g_pAdmins[iSlot].vFlags.clear();
@@ -1242,6 +1247,38 @@ bool AdminApi::IsAdmin(int iSlot)
 	return !g_pAdmins[iSlot].vFlags.empty();
 }
 
+const char* AdminApi::GetAdminName(int iSlot)
+{
+	if(g_pAdmins[iSlot].iID > 0)
+	{
+		return g_pAdmins[iSlot].szName.c_str();
+	}
+	return engine->GetClientConVarValue(iSlot, "name");
+}
+
+int AdminApi::GetAdminGroupID(int iSlot)
+{
+	if(g_pAdmins[iSlot].iID > 0)
+	{
+		return g_pAdmins[iSlot].iGroup;
+	}
+	return -1;
+}
+
+const char* AdminApi::GetAdminGroupName(int iSlot)
+{
+	if(g_pAdmins[iSlot].iID > 0)
+	{
+		return g_pAdmins[iSlot].szGroupName.c_str();
+	}
+	return "";
+}
+
+int AdminApi::GetImmunityType()
+{
+	return g_iImmunityType;
+}
+
 std::vector<std::string> AdminApi::GetPermissionsByFlag(const char* szFlag)
 {
 	std::vector<std::string> vPermissions;
@@ -1509,7 +1546,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.6.2";
+	return "1.0.7";
 }
 
 const char* admin_system::GetDate()
