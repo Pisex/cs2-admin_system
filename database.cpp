@@ -419,7 +419,7 @@ bool AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
             iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID,
             std::time(0),
             iTime == 0 ? 0 : std::time(0) + iTime,
-            szReason.c_str(),
+            g_pConnection->Escape(szReason.c_str()).c_str(),
             g_iServerID[SID_PUNISH],
             iType
         );
@@ -455,7 +455,7 @@ void AddOfflinePunishment(const char* szSteamID64, const char* szName, int iType
         iAdminID == -1 ? 1 : g_pAdmins[iAdminID].iID,
         std::time(0),
         iTime == 0 ? 0 : std::time(0) + iTime,
-        szReason.c_str(),
+        g_pConnection->Escape(szReason.c_str()).c_str(),
         g_iServerID[SID_PUNISH],
         iType
     );

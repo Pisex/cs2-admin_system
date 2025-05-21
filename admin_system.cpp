@@ -1224,6 +1224,9 @@ bool HasAccessInCategory(int iSlot, const char* szCategory)
 
 bool AdminApi::HasPermission(int iSlot, const char* szPermission)
 {
+	if(iSlot == -1) return true;
+	if(iSlot < 0 || iSlot > 64) return false;
+	if (g_pAdmins[iSlot].vPermissions.empty()) return false;
     if (std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), szPermission) != g_pAdmins[iSlot].vPermissions.end() ||
 		std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), "@admin/root") != g_pAdmins[iSlot].vPermissions.end() ||
 		std::find(g_vecDefaultFlags.begin(), g_vecDefaultFlags.end(), szPermission) != g_vecDefaultFlags.end())
@@ -1234,6 +1237,8 @@ bool AdminApi::HasPermission(int iSlot, const char* szPermission)
 
 bool AdminApi::HasFlag(int iSlot, const char* szFlag)
 {
+	if(iSlot == -1) return true;
+	if(iSlot < 0 || iSlot > 64) return false;
 	if (g_pAdmins[iSlot].vFlags.empty()) return false;
 	if (std::find(g_pAdmins[iSlot].vFlags.begin(), g_pAdmins[iSlot].vFlags.end(), szFlag) != g_pAdmins[iSlot].vFlags.end()) {
 		return true;
@@ -1244,11 +1249,15 @@ bool AdminApi::HasFlag(int iSlot, const char* szFlag)
 
 bool AdminApi::IsAdmin(int iSlot)
 {
+	if(iSlot == -1) return true;
+	if(iSlot < 0 || iSlot > 64) return false;
 	return !g_pAdmins[iSlot].vFlags.empty();
 }
 
 const char* AdminApi::GetAdminName(int iSlot)
 {
+	if(iSlot == -1) return "Console";
+	if(iSlot < 0 || iSlot > 64) return "";
 	if(g_pAdmins[iSlot].iID > 0)
 	{
 		return g_pAdmins[iSlot].szName.c_str();
@@ -1258,6 +1267,7 @@ const char* AdminApi::GetAdminName(int iSlot)
 
 int AdminApi::GetAdminGroupID(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return -1;
 	if(g_pAdmins[iSlot].iID > 0)
 	{
 		return g_pAdmins[iSlot].iGroup;
@@ -1267,6 +1277,7 @@ int AdminApi::GetAdminGroupID(int iSlot)
 
 const char* AdminApi::GetAdminGroupName(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return "";
 	if(g_pAdmins[iSlot].iID > 0)
 	{
 		return g_pAdmins[iSlot].szGroupName.c_str();
@@ -1291,31 +1302,37 @@ std::vector<std::string> AdminApi::GetPermissionsByFlag(const char* szFlag)
 
 std::vector<std::string> AdminApi::GetAdminFlags(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return {};
 	return g_pAdmins[iSlot].vFlags;
 }
 
 std::vector<std::string> AdminApi::GetAdminPermissions(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return {};
 	return g_pAdmins[iSlot].vPermissions;
 }
 
 int AdminApi::GetAdminImmunity(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return 0;
 	return g_pAdmins[iSlot].iImmunity;
 }
 
 bool AdminApi::IsPlayerPunished(int iSlot, int iType)
 {
+	if(iSlot < 0 || iSlot > 64) return false;
 	return g_iPunishments[iSlot][iType] != -1;
 }
 
 int AdminApi::GetPlayerPunishmentExpired(int iSlot, int iType)
 {
+	if(iSlot < 0 || iSlot > 64) return -1;
 	return g_iPunishments[iSlot][iType];
 }
 
 const char* AdminApi::GetPlayerPunishmentReason(int iSlot, int iType)
 {
+	if(iSlot < 0 || iSlot > 64) return "";
 	return g_szPunishReasons[iSlot][iType].c_str();
 }
 
@@ -1400,6 +1417,7 @@ void SendPunishmentNotification(int iSlot, int iType, int iTime, const char* szR
 
 void AdminApi::AddPlayerPunishment(int iSlot, int iType, int iTime, const char* szReason, int iAdminID, bool bNotify, bool bDB)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	int iTimeExpire = iTime == 0 ? 0 : std::time(nullptr) + iTime;
 	if(bNotify) SendPunishmentNotification(iSlot, iType, iTimeExpire, szReason, iAdminID);
 	TryAddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
@@ -1412,6 +1430,7 @@ void AdminApi::AddOfflinePlayerPunishment(const char* szSteamID64, const char* s
 
 void AdminApi::RemovePlayerPunishment(int iSlot, int iType, int iAdminID, bool bNotify)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	if(bNotify && g_iNofityType == 2)
 	{
 		std::string szMessage = "";
@@ -1451,26 +1470,31 @@ const char* AdminApi::GetFlagName(const char* szFlag)
 
 int AdminApi::GetAdminExpireTime(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return -1;
 	return g_pAdmins[iSlot].iExpireTime; 
 }
 
 void AdminApi::ShowAdminMenu(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	OnAdminMenu(iSlot, nullptr);
 }
 
 void AdminApi::ShowAdminCategoryMenu(int iSlot, const char* szCategory)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	ShowCategoryMenu(iSlot, szCategory);
 }
 
 void AdminApi::ShowAdminLastCategoryMenu(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	ShowLastCategoryMenu(iSlot);
 }
 
 void AdminApi::ShowAdminItemMenu(int iSlot, const char* szCategory, const char* szIdentity)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	ShowItemMenu(iSlot, szCategory, szIdentity);
 }
 
@@ -1486,31 +1510,39 @@ void AdminApi::RemovePlayerAdmin(const char* szSteamID64, bool bDB)
 
 void AdminApi::AddPlayerLocalFlag(int iSlot, const char* szFlag)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	g_pAdmins[iSlot].vFlags.push_back(szFlag);
 }
 
 void AdminApi::RemovePlayerLocalFlag(int iSlot, const char* szFlag)
 {
+	if(iSlot < 0 || iSlot > 64) return;
+	if(g_pAdmins[iSlot].vFlags.empty()) return;
 	g_pAdmins[iSlot].vFlags.erase(std::remove(g_pAdmins[iSlot].vFlags.begin(), g_pAdmins[iSlot].vFlags.end(), szFlag), g_pAdmins[iSlot].vFlags.end());
 }
 
 void AdminApi::AddPlayerLocalPermission(int iSlot, const char* szPermission)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	g_pAdmins[iSlot].vPermissions.push_back(szPermission);
 }
 
 void AdminApi::RemovePlayerLocalPermission(int iSlot, const char* szPermission)
 {
+	if(iSlot < 0 || iSlot > 64) return;
+	if(g_pAdmins[iSlot].vPermissions.empty()) return;
 	g_pAdmins[iSlot].vPermissions.erase(std::remove(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), szPermission), g_pAdmins[iSlot].vPermissions.end());
 }
 
 void AdminApi::AddPlayerLocalImmunity(int iSlot, int iImmunity)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	g_pAdmins[iSlot].iImmunity = iImmunity;
 }
 
 void AdminApi::RemovePlayerLocalImmunity(int iSlot)
 {
+	if(iSlot < 0 || iSlot > 64) return;
 	g_pAdmins[iSlot].iImmunity = 0;
 }
 
@@ -1546,7 +1578,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.7";
+	return "1.0.7.1";
 }
 
 const char* admin_system::GetDate()
