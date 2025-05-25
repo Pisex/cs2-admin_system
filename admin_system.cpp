@@ -1226,10 +1226,10 @@ bool AdminApi::HasPermission(int iSlot, const char* szPermission)
 {
 	if(iSlot == -1) return true;
 	if(iSlot < 0 || iSlot > 64) return false;
+	if (std::find(g_vecDefaultFlags.begin(), g_vecDefaultFlags.end(), szPermission) != g_vecDefaultFlags.end()) return true;
 	if (g_pAdmins[iSlot].vPermissions.empty()) return false;
     if (std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), szPermission) != g_pAdmins[iSlot].vPermissions.end() ||
-		std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), "@admin/root") != g_pAdmins[iSlot].vPermissions.end() ||
-		std::find(g_vecDefaultFlags.begin(), g_vecDefaultFlags.end(), szPermission) != g_vecDefaultFlags.end())
+		std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), "@admin/root") != g_pAdmins[iSlot].vPermissions.end())
         return true;
 
     return false;
@@ -1578,7 +1578,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.7.1";
+	return "1.0.7.1f";
 }
 
 const char* admin_system::GetDate()
