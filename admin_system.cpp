@@ -59,6 +59,8 @@ int g_iPunishOfflineCount = 0;
 int g_iUnpunishType = 0;
 int g_iUnpunishOfflineCount = 0;
 
+bool g_bMuteIgnoreCommands = true;
+
 bool g_bPunishIP = false;
 
 bool g_bStaticNames = false;
@@ -712,6 +714,8 @@ void LoadConfig()
 
 	g_iMessageType = pKVConfig->GetInt("message_type");
 
+	g_bMuteIgnoreCommands = pKVConfig->GetBool("mute_ignore_commands", true);
+
 	KeyValues* pKVDefaultPermissions = pKVConfig->FindKey("default_permissions", false);
 	if(pKVDefaultPermissions)
 	{
@@ -911,8 +915,10 @@ bool OnChatPre(int iSlot, const char* szContent, bool bTeam)
 {
 	if(IsClientGaggedOrSilenced(iSlot))
 	{
-		if(strstr(szContent, "!") || strstr(szContent, "/") || !strcmp(szContent, "\"\"")) return false;
-		// if(szContent[1] == '!' || szContent[1] == '/') return true;
+		if(szContent[1] == '!' || szContent[1] == '/') {
+			if(!g_bMuteIgnoreCommands) return true;
+			else return false;
+		}
 		int iType = g_iPunishments[iSlot][RT_GAG] != -1 ? RT_GAG : RT_SILENCE;
 		g_pUtils->PrintToChat(iSlot, g_vecPhrases["MuteActiveChat"].c_str(), g_szPunishReasons[iSlot][iType].c_str(), FormatTime(g_iPunishments[iSlot][iType]).c_str());
 		return false;
@@ -1224,12 +1230,13 @@ bool HasAccessInCategory(int iSlot, const char* szCategory)
 
 bool AdminApi::HasPermission(int iSlot, const char* szPermission)
 {
-	if(iSlot == -1) return true;
-	if(iSlot < 0 || iSlot > 64) return false;
-	if (std::find(g_vecDefaultFlags.begin(), g_vecDefaultFlags.end(), szPermission) != g_vecDefaultFlags.end()) return true;
-	if (g_pAdmins[iSlot].vPermissions.empty()) return false;
+    if (iSlot == -1) return true;
+    if (iSlot < 0 || iSlot >= 64) return false;
+    if (!szPermission) return false;
+    if (std::find(g_vecDefaultFlags.begin(), g_vecDefaultFlags.end(), szPermission) != g_vecDefaultFlags.end()) return true;
+    if (g_pAdmins[iSlot].vPermissions.empty()) return false;
     if (std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), szPermission) != g_pAdmins[iSlot].vPermissions.end() ||
-		std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), "@admin/root") != g_pAdmins[iSlot].vPermissions.end())
+        std::find(g_pAdmins[iSlot].vPermissions.begin(), g_pAdmins[iSlot].vPermissions.end(), "@admin/root") != g_pAdmins[iSlot].vPermissions.end())
         return true;
 
     return false;
@@ -1237,9 +1244,10 @@ bool AdminApi::HasPermission(int iSlot, const char* szPermission)
 
 bool AdminApi::HasFlag(int iSlot, const char* szFlag)
 {
-	if(iSlot == -1) return true;
-	if(iSlot < 0 || iSlot > 64) return false;
-	if (g_pAdmins[iSlot].vFlags.empty()) return false;
+    if (iSlot == -1) return true;
+    if (iSlot < 0 || iSlot >= 64) return false;
+    if (!szFlag) return false;
+    if (g_pAdmins[iSlot].vFlags.empty()) return false;
 	if (std::find(g_pAdmins[iSlot].vFlags.begin(), g_pAdmins[iSlot].vFlags.end(), szFlag) != g_pAdmins[iSlot].vFlags.end()) {
 		return true;
 	}
@@ -1420,12 +1428,12 @@ void AdminApi::AddPlayerPunishment(int iSlot, int iType, int iTime, const char* 
 	if(iSlot < 0 || iSlot > 64) return;
 	int iTimeExpire = iTime == 0 ? 0 : std::time(nullptr) + iTime;
 	if(bNotify) SendPunishmentNotification(iSlot, iType, iTimeExpire, szReason, iAdminID);
-	TryAddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
+	AddPunishment(iSlot, iType, iTime, szReason, iAdminID, bDB);
 }
 
 void AdminApi::AddOfflinePlayerPunishment(const char* szSteamID64, const char* szName, int iType, int iTime, const char* szReason, int iAdminID)
 {
-	TryAddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
+	AddOfflinePunishment(szSteamID64, szName, iType, iTime, szReason, iAdminID);
 }
 
 void AdminApi::RemovePlayerPunishment(int iSlot, int iType, int iAdminID, bool bNotify)
@@ -1578,7 +1586,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.7.1f";
+	return "1.0.7.2f";
 }
 
 const char* admin_system::GetDate()

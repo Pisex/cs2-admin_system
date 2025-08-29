@@ -12,7 +12,7 @@
 #include <deque>
 #include <functional>
 #include <utlstring.h>
-#include <KeyValues.h>
+#include <keyvalues.h>
 #include "CCSPlayerController.h"
 #include "include/menus.h"
 #include "include/mysql_mm.h"
