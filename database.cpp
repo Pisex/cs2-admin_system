@@ -359,8 +359,13 @@ void CheckPermissions(int iSlot, uint64 xuid)
             hAdmin.iImmunity = 0;
             while (result->FetchRow()) {
                 hAdmin.iID = result->GetInt(0);
-                hAdmin.szName = result->GetString(1);
-                int iImmunity = result->GetInt(3);
+                
+                if(result->IsNull(1))
+                    hAdmin.szName = engine->GetClientConVarValue(iSlot, "name");
+                else 
+                    hAdmin.szName = result->GetString(1);
+
+                int iImmunity = result->IsNull(3) ? 0 : result->GetInt(3);
                 if(iImmunity > hAdmin.iImmunity) hAdmin.iImmunity = iImmunity;
                 int iGroupImmunity = result->IsNull(8) ? 0 : result->GetInt(8);
                 int iServerID = result->GetInt(9);
@@ -368,11 +373,15 @@ void CheckPermissions(int iSlot, uint64 xuid)
                 if(iGroupImmunity > hAdmin.iImmunity) hAdmin.iImmunity = iGroupImmunity;
                 int iExpires = result->GetInt(4);
                 if((iExpires > hAdmin.iExpireTime || iExpires == 0) && hAdmin.iExpireTime != 0) hAdmin.iExpireTime = iExpires;
-                const char* szFlags = result->GetString(2);
-                for (size_t i = 0; i < strlen(szFlags); i++) {
-                    std::vector<std::string> vPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szFlags[i]).c_str());
-                    hAdmin.vPermissions.insert(hAdmin.vPermissions.end(), vPermissions.begin(), vPermissions.end());
-                    hAdmin.vFlags.push_back(std::string(1, szFlags[i]));
+                if(!result->IsNull(2)) {
+                    const char* szFlags = result->GetString(2);
+                    if(szFlags) {
+                        for (size_t i = 0; i < strlen(szFlags); i++) {
+                            std::vector<std::string> vPermissions = g_pAdminApi->GetPermissionsByFlag(std::string(1, szFlags[i]).c_str());
+                            hAdmin.vPermissions.insert(hAdmin.vPermissions.end(), vPermissions.begin(), vPermissions.end());
+                            hAdmin.vFlags.push_back(std::string(1, szFlags[i]));
+                        }
+                    }
                 }
                 if(!result->IsNull(5) && result->GetInt(5) != 0) {
                     int iGroupID = result->GetInt(5);

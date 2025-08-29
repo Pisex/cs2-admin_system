@@ -413,8 +413,12 @@ void OnPunishSelect(int iSlot, const char* szCategory, const char* szIdentity, c
 
 void ShowItemMenu(int iSlot, const char* szCategory, const char* szIdentity)
 {
-    Category& category = mCategories[szCategory];
-    Item& item = category.mItems[szIdentity];
+    auto catIt = mCategories.find(szCategory);
+    if (catIt == mCategories.end()) return;
+    Category& category = catIt->second;
+    auto itemIt = category.mItems.find(szIdentity);
+    if (itemIt == category.mItems.end()) return;
+    Item& item = itemIt->second;
     if(item.hCallbackSelect) item.hCallbackSelect(iSlot, szCategory, szIdentity, item.szName);
 }
 
@@ -422,25 +426,33 @@ void OnAdminItemMenuCallback(const char* szBack, const char* szFront, int iItem,
 {
     if(iItem < 7)
     {
+        if (!szBack || !g_szLastCategory[iSlot].size()) return;
         const char* szItem = szBack;
         ShowItemMenu(iSlot, g_szLastCategory[iSlot].c_str(), szItem);
     }
     else if(iItem == 7)
     {
+        if (!szBack) return;
         OnAdminMenu(iSlot, szBack);
     }
 }
 
 void ShowCategoryMenu(int iSlot, const char* szCategory)
 {
-    Category& category = mCategories[szCategory];
+    auto catIt = mCategories.find(szCategory);
+    if (catIt == mCategories.end()) return;
+    Category& category = catIt->second;
     Menu hMenu;
+    if (!g_pMenus || !g_pAdminApi) return;
     g_pMenus->SetTitleMenu(hMenu, g_pAdminApi->GetTranslation(category.szName));
-    if(g_mSortItems.find(szCategory) != g_mSortItems.end())
+    auto sortIt = g_mSortItems.find(szCategory);
+    if(sortIt != g_mSortItems.end())
     {
-        for (const auto& item : g_mSortItems[szCategory]) {
-            if(!category.mItems[item].szCategory[0] || !category.mItems[item].szIdentity[0]) continue;
-            const Item& _item = category.mItems[item];
+        for (const auto& item : sortIt->second) {
+            auto itemIt = category.mItems.find(item);
+            if(itemIt == category.mItems.end()) continue;
+            const Item& _item = itemIt->second;
+            if(!_item.szCategory[0] || !_item.szIdentity[0]) continue;
             if(!HasAccessInItem(iSlot, _item.szCategory, _item.szIdentity)) continue;
             std::string szName = g_pAdminApi->GetTranslation(_item.szName);
             if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
@@ -449,8 +461,9 @@ void ShowCategoryMenu(int iSlot, const char* szCategory)
     }
     for (const auto& item : category.mItems) {
         const std::string& key = item.first;
-        if(g_mSortItems[szCategory].size() > 0 && std::find(g_mSortItems[szCategory].begin(), g_mSortItems[szCategory].end(), key) != g_mSortItems[szCategory].end()) continue;
+        if(sortIt != g_mSortItems.end() && sortIt->second.size() > 0 && std::find(sortIt->second.begin(), sortIt->second.end(), key) != sortIt->second.end()) continue;
         const Item& _item = item.second;
+        if(!_item.szCategory[0] || !_item.szIdentity[0]) continue;
         if(!HasAccessInItem(iSlot, _item.szCategory, _item.szIdentity)) continue;
         std::string szName = g_pAdminApi->GetTranslation(_item.szName);
         if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
@@ -464,6 +477,7 @@ void ShowCategoryMenu(int iSlot, const char* szCategory)
 
 void ShowLastCategoryMenu(int iSlot)
 {
+    if (!g_szLastCategory[iSlot].size()) return;
     ShowCategoryMenu(iSlot, g_szLastCategory[iSlot].c_str());
 }
 
@@ -471,6 +485,7 @@ void OnAdminMenuCallback(const char* szBack, const char* szFront, int iItem, int
 {
     if(iItem < 7)
     {
+        if (!szBack) return;
         g_szLastCategory[iSlot] = strdup(szBack);
         ShowCategoryMenu(iSlot, g_szLastCategory[iSlot].c_str());
     }
@@ -478,12 +493,16 @@ void OnAdminMenuCallback(const char* szBack, const char* szFront, int iItem, int
 
 bool OnAdminMenu(int iSlot, const char* szContent)
 {
-    if(!g_pAdminApi->IsAdmin(iSlot)) return true;
+    if(!g_pAdminApi || !g_pMenus || !g_pAdminApi->IsAdmin(iSlot)) return true;
     Menu hMenu;
-    g_pMenus->SetTitleMenu(hMenu, g_vecPhrases["MainTitle"].c_str());
+    auto phraseIt = g_vecPhrases.find("MainTitle");
+    if (phraseIt == g_vecPhrases.end()) return true;
+    g_pMenus->SetTitleMenu(hMenu, phraseIt->second.c_str());
     for (const auto& category : g_vSortCategories) {
+        auto catIt = mCategories.find(category);
+        if(catIt == mCategories.end()) continue;
         if(!HasAccessInCategory(iSlot, category.c_str())) continue;
-        const Category& _category = mCategories[category];
+        const Category& _category = catIt->second;
         if(!_category.szIdentity[0]) continue;
         std::string szName = g_pAdminApi->GetTranslation(_category.szName);
         if(_category.hCallback) _category.hCallback(iSlot, category.c_str(), szName);
