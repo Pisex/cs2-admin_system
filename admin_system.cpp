@@ -49,7 +49,7 @@ int g_iBanDelay;
 int g_iTime_Reason_Type;
 //if time_reason_type = 0
 std::vector<std::string> g_vReasons[4];
-std::unordered_map<int, std::string> g_mTimes[4];
+std::vector<std::pair<int, std::string>> g_mTimes[4];
 //if time_reason_type = 1
 std::vector<std::pair<std::string, std::vector<std::pair<int, std::string>>>> g_mReasons[4];
 
@@ -865,7 +865,7 @@ void LoadConfig()
 			{
 				FOR_EACH_VALUE(pKVBan, pKVTime)
 				{
-					g_mTimes[RT_BAN][std::atoi(pKVTime->GetName())] = pKVTime->GetString(nullptr);
+					g_mTimes[RT_BAN].push_back({std::atoi(pKVTime->GetName()), pKVTime->GetString(nullptr)});
 				}
 			}
 			KeyValues* pKVMute = pKVTimes->FindKey("mutes", false);
@@ -873,7 +873,7 @@ void LoadConfig()
 			{
 				FOR_EACH_VALUE(pKVMute, pKVTime)
 				{
-					g_mTimes[RT_MUTE][std::atoi(pKVTime->GetName())] = pKVTime->GetString(nullptr);
+					g_mTimes[RT_MUTE].push_back({std::atoi(pKVTime->GetName()), pKVTime->GetString(nullptr)});
 				}
 			}
 			KeyValues* pKVGag = pKVTimes->FindKey("gags", false);
@@ -881,7 +881,7 @@ void LoadConfig()
 			{
 				FOR_EACH_VALUE(pKVGag, pKVTime)
 				{
-					g_mTimes[RT_GAG][std::atoi(pKVTime->GetName())] = pKVTime->GetString(nullptr);
+					g_mTimes[RT_GAG].push_back({std::atoi(pKVTime->GetName()), pKVTime->GetString(nullptr)});
 				}
 			}
 			KeyValues* pKVSilence = pKVTimes->FindKey("silences", false);
@@ -889,7 +889,7 @@ void LoadConfig()
 			{
 				FOR_EACH_VALUE(pKVSilence, pKVTime)
 				{
-					g_mTimes[RT_SILENCE][std::atoi(pKVTime->GetName())] = pKVTime->GetString(nullptr);
+					g_mTimes[RT_SILENCE].push_back({std::atoi(pKVTime->GetName()), pKVTime->GetString(nullptr)});
 				}
 			}
 		}
@@ -1586,7 +1586,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.7.3";
+	return "1.0.7.4";
 }
 
 const char* admin_system::GetDate()

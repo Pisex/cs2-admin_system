@@ -27,7 +27,7 @@ extern uint64 g_iAdminPunish[64][4];
 
 //if g_iTime_Reason_Type = 0
 extern std::vector<std::string> g_vReasons[4];
-extern std::unordered_map<int, std::string> g_mTimes[4];
+extern std::vector<std::pair<int, std::string>> g_mTimes[4];
 //if g_iTime_Reason_Type = 1
 extern std::vector<std::pair<std::string, std::vector<std::pair<int, std::string>>>> g_mReasons[4];;
 
