@@ -22,6 +22,13 @@ extern int g_iUnpunishType;
 extern Admin g_pAdmins[64];
 extern int g_iUnpunishOfflineCount;
 
+extern bool g_bOwnReasons;
+extern bool g_bOwnReason[64];
+extern std::string g_szOwnReason[64];
+extern uint64 g_iTarget[64];
+extern int g_iTargetType[64];
+extern bool g_bTargetOffline[64];
+
 extern int g_iTime_Reason_Type;
 extern uint64 g_iAdminPunish[64][4];
 
@@ -45,12 +52,14 @@ void ShowTimesMenu(int iSlot, uint64 iTarget, int iType, std::string szReason, b
 {
     Menu hMenu;
     g_pMenus->SetTitleMenu(hMenu, g_vecPhrases["SelectTime"].c_str());
+    int iCount = 0;
     if(g_iTime_Reason_Type)
     {
         for (const auto& reason : g_mReasons[iType]) {
             if (reason.first == szReason) {
                 for (const auto& time : reason.second) {
                     g_pMenus->AddItemMenu(hMenu, std::to_string(time.first).c_str(), time.second.c_str());
+                    iCount++;
                 }
                 break;
             }
@@ -60,13 +69,21 @@ void ShowTimesMenu(int iSlot, uint64 iTarget, int iType, std::string szReason, b
     {
         for (const auto& time : g_mTimes[iType]) {
             g_pMenus->AddItemMenu(hMenu, std::to_string(time.first).c_str(), time.second.c_str());
+            iCount++;
         }
+    }
+    if(iCount == 0)
+    {
+        g_pMenus->AddItemMenu(hMenu, "0", g_vecPhrases["NoTimes"].c_str(), ITEM_DISABLED);
     }
     g_pMenus->SetExitMenu(hMenu, true);
     g_pMenus->SetBackMenu(hMenu, true);
     g_pMenus->SetCallback(hMenu, [iType, iTarget, szReason, bOffline](const char* szBack, const char* szFront, int iItem, int iSlot) {
         if(iItem < 7)
         {
+            std::string sReason = szReason;
+            if(szReason == "own")
+                sReason = g_szOwnReason[iSlot];
             if(bOffline)
             {
                 auto it = std::find_if(g_mOfflineUsers.begin(), g_mOfflineUsers.end(), [iTarget](const std::pair<uint64, OfflineUser>& p) {
@@ -78,10 +95,10 @@ void ShowTimesMenu(int iSlot, uint64 iTarget, int iType, std::string szReason, b
                     it->second.iAdminID[iType] = g_pPlayers->GetSteamID64(iSlot);
                     szName = it->second.szName;
                 }
-                g_pAdminApi->AddOfflinePlayerPunishment(std::to_string(iTarget).c_str(), szName.c_str(), iType, std::atoi(szBack), szReason.c_str(), iSlot);
+                g_pAdminApi->AddOfflinePlayerPunishment(std::to_string(iTarget).c_str(), szName.c_str(), iType, std::atoi(szBack), sReason.c_str(), iSlot);
             }
             else
-                g_pAdminApi->AddPlayerPunishment(iTarget, iType, std::atoi(szBack), szReason.c_str(), iSlot, true, true);
+                g_pAdminApi->AddPlayerPunishment(iTarget, iType, std::atoi(szBack), sReason.c_str(), iSlot, true, true);
             g_pMenus->ClosePlayerMenu(iSlot);
         }
         else if(iItem == 7)
@@ -99,11 +116,20 @@ void ShowReasonsMenu(int iSlot, uint64 iTarget, int iType, bool bOffline)
     if(g_iTime_Reason_Type)
     {
         for (const auto& reason : g_mReasons[iType]) {
-            g_pMenus->AddItemMenu(hMenu, reason.first.c_str(), reason.first.c_str());
+            if(reason.first == "own") {
+                if(g_bOwnReasons && g_pAdminApi->HasPermission(iSlot, "@admin/own_reason")) {
+                    g_pMenus->AddItemMenu(hMenu, "own", g_vecPhrases["Item_OwnReason"].c_str());
+                }
+            }
+            else g_pMenus->AddItemMenu(hMenu, reason.first.c_str(), reason.first.c_str());
         }
     }
     else
     {
+        if(g_bOwnReasons && g_pAdminApi->HasPermission(iSlot, "@admin/own_reason"))
+        {
+            g_pMenus->AddItemMenu(hMenu, "own", g_vecPhrases["Item_OwnReason"].c_str());
+        }
         for (const auto& reason : g_vReasons[iType]) {
             g_pMenus->AddItemMenu(hMenu, reason.c_str(), reason.c_str());
         }
@@ -113,6 +139,18 @@ void ShowReasonsMenu(int iSlot, uint64 iTarget, int iType, bool bOffline)
     g_pMenus->SetCallback(hMenu, [iType, iTarget, bOffline](const char* szBack, const char* szFront, int iItem, int iSlot) {
         if(iItem < 7)
         {
+            if(std::string(szBack) == "own")
+            {
+                g_iTarget[iSlot] = iTarget;
+                g_iTargetType[iSlot] = iType;
+                g_bTargetOffline[iSlot] = bOffline;
+
+                g_bOwnReason[iSlot] = true;
+                g_pMenus->ClosePlayerMenu(iSlot);
+                g_pUtils->PrintToChat(iSlot, g_vecPhrases["EnterOwnReason"].c_str());
+
+                return;
+            }
             ShowTimesMenu(iSlot, iTarget, iType, szBack, bOffline);
         }
         else if(iItem == 7)

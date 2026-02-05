@@ -405,7 +405,12 @@ bool AddPunishment(int iSlot, int iType, int iTime, std::string szReason, int iA
 {
     if(g_pAdminApi->OnPlayerPunishPreSend(iSlot, iType, iTime, szReason.c_str(), iAdminID)) return false;
     uint64 SteamID64 = g_pPlayers->GetSteamID64(iSlot);
-    if(SteamID64 == 0) return false;
+    if(SteamID64 == 0) {
+        CCSPlayerController* pController = CCSPlayerController::FromSlot(iSlot);
+        if(!pController) return false;
+        SteamID64 = pController->m_steamID();
+        if(SteamID64 == 0) return false;
+    }
     if(bDB)
     {
         auto playerNetInfo = engine->GetPlayerNetInfo(iSlot);

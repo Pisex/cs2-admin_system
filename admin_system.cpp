@@ -53,11 +53,18 @@ std::vector<std::pair<int, std::string>> g_mTimes[4];
 //if time_reason_type = 1
 std::vector<std::pair<std::string, std::vector<std::pair<int, std::string>>>> g_mReasons[4];
 
+bool g_bOwnReasons = false;
 int g_iNofityType = 0;
 int g_iImmunityType = 0;
 int g_iPunishOfflineCount = 0;
 int g_iUnpunishType = 0;
 int g_iUnpunishOfflineCount = 0;
+
+bool g_bOwnReason[64];
+std::string g_szOwnReason[64];
+uint64 g_iTarget[64];
+int g_iTargetType[64];
+bool g_bTargetOffline[64];
 
 bool g_bMuteIgnoreCommands = true;
 
@@ -387,7 +394,9 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 	for (int i = 0; i < 64; i++)
 	{
 		if(g_pPlayers->IsFakeClient(i)) continue;
-		uint64 m_steamID = g_pPlayers->GetSteamID64(i);
+		CCSPlayerController* pController = CCSPlayerController::FromSlot(i);
+		if (!pController) continue;
+		uint64 m_steamID = pController->m_steamID();
 		if(m_steamID == 0) continue;
 		if(containsOnlyDigits(arg1)) {
 			if(arg1.length() <= 2 && atoi(arg1.c_str()) == i)
@@ -407,7 +416,15 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 		}
 	}
 	int iTime = std::atoi(args[2]);
-    szReason.erase(0, arg1.length() + arg2.length() + 2);
+	szReason.erase(remove(szReason.begin(), szReason.end(), '\"'), szReason.end());
+	size_t pos = szReason.find(arg2);
+	if (pos != std::string::npos) {
+		szReason.erase(0, pos + arg2.length());
+		if (!szReason.empty() && szReason[0] == ' ') {
+			szReason.erase(0, 1);
+		}
+	}
+
 	if(!bConsole && szReason.length() > 0)
 		szReason.pop_back();
 	if(bFound)
@@ -714,6 +731,8 @@ void LoadConfig()
 
 	g_iMessageType = pKVConfig->GetInt("message_type");
 
+	g_bOwnReasons = pKVConfig->GetBool("own_reason", false);
+
 	g_bMuteIgnoreCommands = pKVConfig->GetBool("mute_ignore_commands", true);
 
 	KeyValues* pKVDefaultPermissions = pKVConfig->FindKey("default_permissions", false);
@@ -913,6 +932,18 @@ void LoadTranslations()
 
 bool OnChatPre(int iSlot, const char* szContent, bool bTeam)
 {
+	if(g_bOwnReason[iSlot])
+	{
+		std::string reason = szContent;
+		if(reason[0] == '\"' || reason[0] == '\'')
+			reason.erase(0, 1);
+		if(reason.length() > 0 && (reason[reason.length() - 1] == '\"' || reason[reason.length() - 1] == '\''))
+			reason.erase(reason.length() - 1, 1);
+		g_szOwnReason[iSlot] = reason;
+		g_bOwnReason[iSlot] = false;
+		ShowTimesMenu(iSlot, g_iTarget[iSlot], g_iTargetType[iSlot], "own", g_bTargetOffline[iSlot]);
+		return false;
+	}
 	if(IsClientGaggedOrSilenced(iSlot))
 	{
 		if(szContent[1] == '!' || szContent[1] == '/') {
@@ -1586,7 +1617,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.7.4";
+	return "1.0.8";
 }
 
 const char* admin_system::GetDate()

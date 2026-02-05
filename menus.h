@@ -41,5 +41,6 @@ void ShowCategoryMenu(int iSlot, const char* szCategory);
 void ShowLastCategoryMenu(int iSlot);
 void ShowPunishMenu(int iSlot, int iType);
 void ShowUnPunishMenu(int iSlot, int iType);
+void ShowTimesMenu(int iSlot, uint64 iTarget, int iType, std::string szReason, bool bOffline);
 
 #endif

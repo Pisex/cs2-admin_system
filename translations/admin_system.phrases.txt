@@ -1382,4 +1382,25 @@
 		"ua"	"Голосування завершено. Гравець {LIGHTRED}%s{DEFAULT} покараний"
 		"en"	"Vote completed. Player {LIGHTRED}%s{DEFAULT} punished"
 	}
+
+	"NoTimes"
+	{
+		"ru"	"Не найдено записей"
+		"ua"	"Не знайдено записів"
+		"en"	"No records found"
+	}
+
+	"Item_OwnReason"
+	{
+		"ru"	"Своя причина"
+		"ua"	"Своя причина"
+		"en"	"Own reason"
+	}
+
+	"EnterOwnReason"
+	{
+		"ru"	"Введите свою причину"
+		"ua"	"Введіть свою причину"
+		"en"	"Enter your own reason"
+	}
 }
