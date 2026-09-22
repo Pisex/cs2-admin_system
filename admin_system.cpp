@@ -78,8 +78,10 @@ std::vector<std::string> g_vecDefaultFlags;
 
 std::vector<std::pair<uint64, OfflineUser>> g_mOfflineUsers;
 
-SH_DECL_HOOK6(IServerGameClients, ClientConnect, SH_NOATTRIB, 0, bool, CPlayerSlot, const char*, uint64, const char *, bool, CBufferString *);
-SH_DECL_HOOK5_void(IServerGameClients, ClientDisconnect, SH_NOATTRIB, 0, CPlayerSlot, ENetworkDisconnectionReason, const char *, uint64, const char *);
+KHook::Virtual<IServerGameClients, bool, CPlayerSlot, const char*, uint64, const char *, bool, CBufferString *>
+	g_ClientConnectHook(&IServerGameClients::ClientConnect, &g_admin_system, &admin_system::Hook_OnClientConnect, nullptr);
+KHook::Virtual<IServerGameClients, void, CPlayerSlot, ENetworkDisconnectionReason, const char *, uint64, const char *>
+	g_ClientDisconnectHook(&IServerGameClients::ClientDisconnect, &g_admin_system, &admin_system::Hook_OnClientDisconnect, nullptr);
 
 bool containsOnlyDigits(const std::string& str) {
 	return str.find_first_not_of("0123456789") == std::string::npos;
@@ -635,8 +637,8 @@ bool admin_system::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen, 
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, g_pFullFileSystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, g_pSource2GameClients, IServerGameClients, SOURCE2GAMECLIENTS_INTERFACE_VERSION);
 	
-	SH_ADD_HOOK_MEMFUNC(IServerGameClients, ClientConnect, g_pSource2GameClients, this, &admin_system::OnClientConnect, false );
-	SH_ADD_HOOK(IServerGameClients, ClientDisconnect, g_pSource2GameClients, SH_MEMBER(this, &admin_system::OnClientDisconnect), true);
+	g_ClientConnectHook.Add(g_pSource2GameClients);
+	g_ClientDisconnectHook.Add(g_pSource2GameClients);
 
 	g_SMAPI->AddListener( this, this );
 	
@@ -662,14 +664,14 @@ void* admin_system::OnMetamodQuery(const char* iface, int* ret)
 
 bool admin_system::Unload(char *error, size_t maxlen)
 {
-	SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientConnect, g_pSource2GameClients, this, &admin_system::OnClientConnect, false);
-	SH_REMOVE_HOOK(IServerGameClients, ClientDisconnect, g_pSource2GameClients, SH_MEMBER(this, &admin_system::OnClientDisconnect), true);
+	g_ClientConnectHook.Remove(g_pSource2GameClients);
+	g_ClientDisconnectHook.Remove(g_pSource2GameClients);
 	ConVar_Unregister();
 	
 	return true;
 }
 
-bool admin_system::OnClientConnect(CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason)
+KHook::Return<bool> admin_system::Hook_OnClientConnect(IServerGameClients* pThis, CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason)
 {
 	int iSlot = slot.Get();
 	if(xuid > 0)
@@ -677,7 +679,7 @@ bool admin_system::OnClientConnect(CPlayerSlot slot, const char *pszName, uint64
 		ResetPunishments(iSlot);
 		CheckPunishments(iSlot, xuid);
 	}
-	RETURN_META_VALUE(MRES_IGNORED, true);
+	return { KHook::Action::Ignore, true };
 }
 
 void LoadSorting()
@@ -969,9 +971,9 @@ void OnClientAuthorized(int iSlot, uint64 xuid)
 	CheckPermissions(iSlot, xuid);
 }
 
-void admin_system::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason, const char *pszName, uint64 xuid, const char *pszNetworkID)
+KHook::Return<void> admin_system::Hook_OnClientDisconnect(IServerGameClients* pThis, CPlayerSlot slot, ENetworkDisconnectionReason reason, const char *pszName, uint64 xuid, const char *pszNetworkID)
 {
-	if(xuid <= 0) return;
+	if(xuid <= 0) return { KHook::Action::Ignore };
 	int iSlot = slot.Get();
 	OfflineUser user;
 	user.iSteamID64 = xuid;
@@ -995,6 +997,7 @@ void admin_system::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionRea
 	ResetPunishments(iSlot);
 	g_pAdmins[iSlot].vFlags.clear();
 	g_pAdmins[iSlot].vPermissions.clear();
+	return { KHook::Action::Ignore };
 }
 
 void admin_system::AllPluginsLoaded()
@@ -1617,7 +1620,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.8";
+	return "1.0.9";
 }
 
 const char* admin_system::GetDate()

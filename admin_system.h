@@ -3,6 +3,7 @@
 
 #include <ISmmPlugin.h>
 #include <sh_vector.h>
+#include <khook.hpp>
 #include "utlvector.h"
 #include "ehandle.h"
 #include <iserver.h>
@@ -217,6 +218,8 @@ public:
 	bool Unload(char* error, size_t maxlen);
 	void AllPluginsLoaded();
 	void* OnMetamodQuery(const char* iface, int* ret);
+	KHook::Return<bool> Hook_OnClientConnect(IServerGameClients* pThis, CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason);
+	KHook::Return<void> Hook_OnClientDisconnect(IServerGameClients* pThis, CPlayerSlot slot, ENetworkDisconnectionReason reason, const char *pszName, uint64 xuid, const char *pszNetworkID);
 private:
 	const char* GetAuthor();
 	const char* GetName();
@@ -226,9 +229,6 @@ private:
 	const char* GetVersion();
 	const char* GetDate();
 	const char* GetLogTag();
-private:
-	bool OnClientConnect(CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason);
-	void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason, const char *pszName, uint64 xuid, const char *pszNetworkID);
 };
 
 #endif //_INCLUDE_METAMOD_SOURCE_STUB_PLUGIN_H_
