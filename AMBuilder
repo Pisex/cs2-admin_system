@@ -14,6 +14,7 @@ for sdk_target in MMSPlugin.sdk_targets:
   
   binary.compiler.cxxincludes += [
     os.path.join(builder.sourcePath, '..', '..', 'samples', 'SchemaEntity'),
+    os.path.join(MMSPlugin.khook_path, 'include'),
   ]
 
   binary.sources += [
@@ -22,6 +23,10 @@ for sdk_target in MMSPlugin.sdk_targets:
     'menus.cpp',
     os.path.join('..', '..', 'samples', 'SchemaEntity', 'schemasystem.cpp'),
   ]
+
+  for khook_task in MMSPlugin.libkhook:
+    if khook_task.target.arch == cxx.target.arch:
+      binary.compiler.linkflags += [khook_task.binary]
 
   if cxx.target.arch == 'x86':
     binary.sources += ['sourcehook/sourcehook_hookmangen.cpp']
