@@ -36,7 +36,17 @@ def ResolveMMSRoot():
   
   return os.path.abspath(os.path.normpath(prenormalized_path))
 
+def ResolveKHookRoot():
+  prenormalized_path = builder.options.khook_path
+  if not prenormalized_path:
+    prenormalized_path = ResolveEnvPath('KHOOK_PATH', 'khook')
+  if not prenormalized_path or not os.path.isdir(prenormalized_path):
+    raise Exception('Could not find a source copy of KHook')
+
+  return os.path.abspath(os.path.normpath(prenormalized_path))
+
 mms_root = ResolveMMSRoot()
+khook_root = ResolveKHookRoot()
 
 if not builder.options.hl2sdk_manifests:
   raise Exception('Could not find a source copy of HL2SDK manifests')
@@ -279,6 +289,19 @@ class MMSPluginConfig(object):
 MMSPlugin = MMSPluginConfig()
 MMSPlugin.detectSDKs()
 MMSPlugin.configure()
+
+class KHookConfig(object):
+  def __init__(self, all_targets):
+    self.all_targets = all_targets
+    self.libsafetyhook = {}
+    self.libkhook = {}
+
+KH = KHookConfig(MMSPlugin.all_targets)
+builder.Build(os.path.join(khook_root, 'third_party', 'safetyhook', 'AMBuilder'), { 'SafetyHook': KH })
+builder.Build(os.path.join(khook_root, 'AMBuilder'), { 'KHook': KH })
+
+MMSPlugin.khook_path = khook_root
+MMSPlugin.libkhook = KH.libkhook
 
 BuildScripts = [
   'AMBuilder',

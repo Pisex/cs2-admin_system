@@ -24,6 +24,7 @@ jobs:
       HL2SDK_ROOT: "${{ github.workspace }}/external"
       MMS_PATH: "${{ github.workspace }}/external/metamod-source"
       MANIFEST_PATH: "${{ github.workspace }}/external/metamod-source/hl2sdk-manifests"
+      KHOOK_PATH: "${{ github.workspace }}/external/khook"
 
     steps:
       - name: Checkout code
@@ -46,10 +47,17 @@ jobs:
           mkdir -p external
           cd external
 
-          git clone --recursive --branch master --single-branch \
-            https://github.com/alliedmodders/metamod-source.git
-          git clone --recursive --branch cs2 --single-branch \
-            https://github.com/alliedmodders/hl2sdk.git hl2sdk-cs2
+          git clone --recursive https://github.com/alliedmodders/metamod-source.git
+          git -C metamod-source checkout fa6f80e4662e5b96cc2e97722d812f374581dfd8
+          git -C metamod-source submodule update --init --recursive
+
+          git clone --recursive https://github.com/alliedmodders/hl2sdk.git hl2sdk-cs2
+          git -C hl2sdk-cs2 checkout 984726aed1bd691055b45905ea964a7f9a28044f
+          git -C hl2sdk-cs2 submodule update --init --recursive
+
+          git clone --recursive https://github.com/Kenzzer/KHook.git khook
+          git -C khook checkout 40d233d160b5bf60cc3e732939142b222fbd8ece
+          git -C khook submodule update --init --recursive
 
           cd ../../..
           mkdir samples
@@ -60,7 +68,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          python3 ../configure.py -s cs2 --targets x86_64 --enable-optimize --hl2sdk-manifests=./hl2sdk-manifests --mms_path=$MMS_PATH --hl2sdk-root=$HL2SDK_ROOT
+          python3 ../configure.py -s cs2 --targets x86_64 --enable-optimize --hl2sdk-manifests=./hl2sdk-manifests --mms_path=$MMS_PATH --hl2sdk-root=$HL2SDK_ROOT --khook_path=$KHOOK_PATH
           ambuild
 
       - name: Package addon into ZIP
