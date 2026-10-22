@@ -2,7 +2,6 @@
 #define _INCLUDE_METAMOD_SOURCE_STUB_PLUGIN_H_
 
 #include <ISmmPlugin.h>
-#include <sh_vector.h>
 #include "utlvector.h"
 #include "ehandle.h"
 #include <iserver.h>
@@ -227,8 +226,10 @@ private:
 	const char* GetDate();
 	const char* GetLogTag();
 private:
-	bool OnClientConnect(CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason);
-	void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason, const char *pszName, uint64 xuid, const char *pszNetworkID);
+	KHook::Return<bool> OnClientConnect(IServerGameClients*, CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason);
+	KHook::Virtual<IServerGameClients, bool, CPlayerSlot, const char*, uint64, const char *, bool, CBufferString *> m_ClientConnect{&IServerGameClients::ClientConnect, this, &admin_system::OnClientConnect, nullptr};
+	KHook::Return<void> OnClientDisconnect(IServerGameClients*, CPlayerSlot slot, ENetworkDisconnectionReason reason, const char *pszName, uint64 xuid, const char *pszNetworkID);
+	KHook::Virtual<IServerGameClients, void, CPlayerSlot, ENetworkDisconnectionReason, const char *, uint64, const char *> m_ClientDisconnect{&IServerGameClients::ClientDisconnect, this, nullptr, &admin_system::OnClientDisconnect};
 };
 
 #endif //_INCLUDE_METAMOD_SOURCE_STUB_PLUGIN_H_

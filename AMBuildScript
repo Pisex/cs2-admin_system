@@ -128,7 +128,7 @@ class MMSPluginConfig(object):
         '-fno-strict-aliasing',
         '-Wall',
         '-Werror',
-        '-Wno-uninitialized',
+        '-Wno-uninitialized', '-Wno-unknown-pragmas', '-Wno-dangling-else',
         '-Wno-parentheses',
         '-Wno-unused',
         '-Wno-switch',
@@ -254,7 +254,7 @@ class MMSPluginConfig(object):
     cxx.cxxincludes += [
       os.path.join(context.currentSourcePath),
       os.path.join(mms_core_path),	
-      os.path.join(mms_core_path, 'sourcehook'),
+      os.path.join(self.mms_root, 'third_party', 'khook', 'include'),
     ]
 
     defines = []

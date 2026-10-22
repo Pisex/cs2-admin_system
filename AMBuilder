@@ -23,8 +23,6 @@ for sdk_target in MMSPlugin.sdk_targets:
     os.path.join('..', '..', 'samples', 'SchemaEntity', 'schemasystem.cpp'),
   ]
 
-  if cxx.target.arch == 'x86':
-    binary.sources += ['sourcehook/sourcehook_hookmangen.cpp']
   nodes = builder.Add(binary)
   MMSPlugin.binaries += [nodes]
     
