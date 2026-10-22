@@ -78,10 +78,6 @@ std::vector<std::string> g_vecDefaultFlags;
 
 std::vector<std::pair<uint64, OfflineUser>> g_mOfflineUsers;
 
-KHook::Virtual<IServerGameClients, bool, CPlayerSlot, const char*, uint64, const char *, bool, CBufferString *>
-	g_ClientConnectHook(&IServerGameClients::ClientConnect, &g_admin_system, &admin_system::Hook_OnClientConnect, nullptr);
-KHook::Virtual<IServerGameClients, void, CPlayerSlot, ENetworkDisconnectionReason, const char *, uint64, const char *>
-	g_ClientDisconnectHook(&IServerGameClients::ClientDisconnect, &g_admin_system, &admin_system::Hook_OnClientDisconnect, nullptr);
 
 bool containsOnlyDigits(const std::string& str) {
 	return str.find_first_not_of("0123456789") == std::string::npos;
@@ -637,8 +633,8 @@ bool admin_system::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen, 
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, g_pFullFileSystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, g_pSource2GameClients, IServerGameClients, SOURCE2GAMECLIENTS_INTERFACE_VERSION);
 	
-	g_ClientConnectHook.Add(g_pSource2GameClients);
-	g_ClientDisconnectHook.Add(g_pSource2GameClients);
+	m_ClientConnect.Add(g_pSource2GameClients);
+	m_ClientDisconnect.Add(g_pSource2GameClients);
 
 	g_SMAPI->AddListener( this, this );
 	
@@ -664,14 +660,14 @@ void* admin_system::OnMetamodQuery(const char* iface, int* ret)
 
 bool admin_system::Unload(char *error, size_t maxlen)
 {
-	g_ClientConnectHook.Remove(g_pSource2GameClients);
-	g_ClientDisconnectHook.Remove(g_pSource2GameClients);
+	m_ClientConnect.Remove(g_pSource2GameClients);
+	m_ClientDisconnect.Remove(g_pSource2GameClients);
 	ConVar_Unregister();
 	
 	return true;
 }
 
-KHook::Return<bool> admin_system::Hook_OnClientConnect(IServerGameClients* pThis, CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason)
+KHook::Return<bool> admin_system::OnClientConnect(IServerGameClients*, CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason)
 {
 	int iSlot = slot.Get();
 	if(xuid > 0)
@@ -971,7 +967,7 @@ void OnClientAuthorized(int iSlot, uint64 xuid)
 	CheckPermissions(iSlot, xuid);
 }
 
-KHook::Return<void> admin_system::Hook_OnClientDisconnect(IServerGameClients* pThis, CPlayerSlot slot, ENetworkDisconnectionReason reason, const char *pszName, uint64 xuid, const char *pszNetworkID)
+KHook::Return<void> admin_system::OnClientDisconnect(IServerGameClients*, CPlayerSlot slot, ENetworkDisconnectionReason reason, const char *pszName, uint64 xuid, const char *pszNetworkID)
 {
 	if(xuid <= 0) return { KHook::Action::Ignore };
 	int iSlot = slot.Get();
@@ -1620,7 +1616,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.9";
+	return "1.0.8";
 }
 
 const char* admin_system::GetDate()
