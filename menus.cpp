@@ -106,7 +106,7 @@ void ShowTimesMenu(int iSlot, uint64 iTarget, int iType, std::string szReason, b
             ShowReasonsMenu(iSlot, iTarget, iType, bOffline);
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void ShowReasonsMenu(int iSlot, uint64 iTarget, int iType, bool bOffline)
@@ -159,7 +159,7 @@ void ShowReasonsMenu(int iSlot, uint64 iTarget, int iType, bool bOffline)
             else ShowPunishMenu(iSlot, iType);
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void ShowPunishMenu(int iSlot, int iType)
@@ -238,7 +238,7 @@ void ShowPunishMenu(int iSlot, int iType)
             OnPunishSelect(iSlot, "", "", "");
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void ShowUnPunishMenu(int iSlot, int iType)
@@ -277,7 +277,7 @@ void ShowUnPunishMenu(int iSlot, int iType)
             OnUnPunishSelect(iSlot, "", "", "");
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void ShowPunishOfflineMenu(int iSlot, int iType)
@@ -306,7 +306,7 @@ void ShowPunishOfflineMenu(int iSlot, int iType)
             OnPunishOfflineSelect(iSlot, "", "", "");
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void OnPunishOfflineSelect(int iSlot, const char* szCategory, const char* szIdentity, const char* szItem)
@@ -329,7 +329,7 @@ void OnPunishOfflineSelect(int iSlot, const char* szCategory, const char* szIden
             ShowLastCategoryMenu(iSlot);
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void ShowUnPunishOfflineMenu(int iSlot, int iType)
@@ -376,7 +376,7 @@ void ShowUnPunishOfflineMenu(int iSlot, int iType)
                 OnUnPunishOfflineSelect(iSlot, "", "", "");
             }
         });
-        g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+        g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
     });
 }
 
@@ -400,7 +400,7 @@ void OnUnPunishOfflineSelect(int iSlot, const char* szCategory, const char* szId
             ShowLastCategoryMenu(iSlot);
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void OnUnPunishSelect(int iSlot, const char* szCategory, const char* szIdentity, const char* szItem)
@@ -423,7 +423,7 @@ void OnUnPunishSelect(int iSlot, const char* szCategory, const char* szIdentity,
             ShowLastCategoryMenu(iSlot);
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void OnPunishSelect(int iSlot, const char* szCategory, const char* szIdentity, const char* szItem)
@@ -446,7 +446,7 @@ void OnPunishSelect(int iSlot, const char* szCategory, const char* szIdentity, c
             ShowLastCategoryMenu(iSlot);
         }
     });
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void ShowItemMenu(int iSlot, const char* szCategory, const char* szIdentity)
@@ -475,42 +475,70 @@ void OnAdminItemMenuCallback(const char* szBack, const char* szFront, int iItem,
     }
 }
 
-void ShowCategoryMenu(int iSlot, const char* szCategory)
+std::vector<AdminMenuEntry> CollectCategoryItems(int iSlot, const char* szCategory)
 {
+    std::vector<AdminMenuEntry> vecItems;
+    if (!szCategory || !g_pAdminApi) return vecItems;
     auto catIt = mCategories.find(szCategory);
-    if (catIt == mCategories.end()) return;
+    if (catIt == mCategories.end()) return vecItems;
     Category& category = catIt->second;
-    Menu hMenu;
-    if (!g_pMenus || !g_pAdminApi) return;
-    g_pMenus->SetTitleMenu(hMenu, g_pAdminApi->GetTranslation(category.szName));
+    auto addItem = [&](const Item& _item) {
+        if(!_item.szCategory || !_item.szIdentity || !_item.szCategory[0] || !_item.szIdentity[0]) return;
+        if(!HasAccessInItem(iSlot, _item.szCategory, _item.szIdentity)) return;
+        std::string szName = g_pAdminApi->GetTranslation(_item.szName);
+        if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
+        vecItems.push_back({_item.szIdentity, szName});
+    };
     auto sortIt = g_mSortItems.find(szCategory);
     if(sortIt != g_mSortItems.end())
     {
         for (const auto& item : sortIt->second) {
             auto itemIt = category.mItems.find(item);
-            if(itemIt == category.mItems.end()) continue;
-            const Item& _item = itemIt->second;
-            if(!_item.szCategory[0] || !_item.szIdentity[0]) continue;
-            if(!HasAccessInItem(iSlot, _item.szCategory, _item.szIdentity)) continue;
-            std::string szName = g_pAdminApi->GetTranslation(_item.szName);
-            if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
-            g_pMenus->AddItemMenu(hMenu, _item.szIdentity, szName.c_str());
+            if(itemIt != category.mItems.end()) addItem(itemIt->second);
         }
     }
     for (const auto& item : category.mItems) {
-        const std::string& key = item.first;
-        if(sortIt != g_mSortItems.end() && sortIt->second.size() > 0 && std::find(sortIt->second.begin(), sortIt->second.end(), key) != sortIt->second.end()) continue;
-        const Item& _item = item.second;
-        if(!_item.szCategory[0] || !_item.szIdentity[0]) continue;
-        if(!HasAccessInItem(iSlot, _item.szCategory, _item.szIdentity)) continue;
-        std::string szName = g_pAdminApi->GetTranslation(_item.szName);
-        if(_item.hCallbackDisplay) _item.hCallbackDisplay(iSlot, _item.szCategory, _item.szIdentity, szName);
-        g_pMenus->AddItemMenu(hMenu, _item.szIdentity, szName.c_str());
+        if(sortIt != g_mSortItems.end() && std::find(sortIt->second.begin(), sortIt->second.end(), item.first) != sortIt->second.end()) continue;
+        addItem(item.second);
     }
+    return vecItems;
+}
+
+std::vector<AdminMenuEntry> CollectCategories(int iSlot)
+{
+    std::vector<AdminMenuEntry> vecCategories;
+    if (!g_pAdminApi || !g_pAdminApi->IsAdmin(iSlot)) return vecCategories;
+    auto addCategory = [&](const std::string& key, const Category& category) {
+        if(!category.szIdentity || !category.szIdentity[0]) return;
+        if(!HasAccessInCategory(iSlot, key.c_str())) return;
+        std::string szName = g_pAdminApi->GetTranslation(category.szName);
+        if(category.hCallback) category.hCallback(iSlot, key.c_str(), szName);
+        vecCategories.push_back({key, szName});
+    };
+    for (const auto& category : g_vSortCategories) {
+        auto catIt = mCategories.find(category);
+        if(catIt != mCategories.end()) addCategory(category, catIt->second);
+    }
+    for (const auto& item : mCategories) {
+        if(std::find(g_vSortCategories.begin(), g_vSortCategories.end(), item.first) != g_vSortCategories.end()) continue;
+        addCategory(item.first, item.second);
+    }
+    return vecCategories;
+}
+
+void ShowCategoryMenu(int iSlot, const char* szCategory)
+{
+    if (!g_pMenus || !g_pAdminApi) return;
+    auto catIt = mCategories.find(szCategory);
+    if (catIt == mCategories.end()) return;
+    Menu hMenu;
+    g_pMenus->SetTitleMenu(hMenu, g_pAdminApi->GetTranslation(catIt->second.szName));
+    for (const auto& entry : CollectCategoryItems(iSlot, szCategory))
+        g_pMenus->AddItemMenu(hMenu, entry.szIdentity.c_str(), entry.szName.c_str());
     g_pMenus->SetExitMenu(hMenu, true);
     g_pMenus->SetBackMenu(hMenu, true);
     g_pMenus->SetCallback(hMenu, OnAdminItemMenuCallback);
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
 }
 
 void ShowLastCategoryMenu(int iSlot)
@@ -524,7 +552,7 @@ void OnAdminMenuCallback(const char* szBack, const char* szFront, int iItem, int
     if(iItem < 7)
     {
         if (!szBack) return;
-        g_szLastCategory[iSlot] = strdup(szBack);
+        g_szLastCategory[iSlot] = szBack;
         ShowCategoryMenu(iSlot, g_szLastCategory[iSlot].c_str());
     }
 }
@@ -536,30 +564,11 @@ bool OnAdminMenu(int iSlot, const char* szContent)
     auto phraseIt = g_vecPhrases.find("MainTitle");
     if (phraseIt == g_vecPhrases.end()) return true;
     g_pMenus->SetTitleMenu(hMenu, phraseIt->second.c_str());
-    for (const auto& category : g_vSortCategories) {
-        auto catIt = mCategories.find(category);
-        if(catIt == mCategories.end()) continue;
-        if(!HasAccessInCategory(iSlot, category.c_str())) continue;
-        const Category& _category = catIt->second;
-        if(!_category.szIdentity[0]) continue;
-        std::string szName = g_pAdminApi->GetTranslation(_category.szName);
-        if(_category.hCallback) _category.hCallback(iSlot, category.c_str(), szName);
-        g_pMenus->AddItemMenu(hMenu, category.c_str(), szName.c_str());
-    }
-
-    for (const auto& item : mCategories) {
-        const std::string& key = item.first;
-        if(g_vSortCategories.size() > 0 && std::find(g_vSortCategories.begin(), g_vSortCategories.end(), key) != g_vSortCategories.end()) continue;
-        const Category& category = item.second;
-        const char* szIdentity = category.szIdentity;
-        std::string szName = g_pAdminApi->GetTranslation(category.szName);
-        if(!HasAccessInCategory(iSlot, szIdentity)) continue;
-        if(category.hCallback) category.hCallback(iSlot, szIdentity, szName);
-        g_pMenus->AddItemMenu(hMenu, key.c_str(), szName.c_str());
-    }
+    for (const auto& entry : CollectCategories(iSlot))
+        g_pMenus->AddItemMenu(hMenu, entry.szIdentity.c_str(), entry.szName.c_str());
     g_pMenus->SetExitMenu(hMenu, true);
     g_pMenus->SetBackMenu(hMenu, false);
     g_pMenus->SetCallback(hMenu, OnAdminMenuCallback); 
-    g_pMenus->DisplayPlayerMenu(hMenu, iSlot);
+    g_pMenus->DisplayPlayerMenu(hMenu, iSlot, true, true);
     return true;
 }

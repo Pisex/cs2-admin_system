@@ -78,8 +78,6 @@ std::vector<std::string> g_vecDefaultFlags;
 
 std::vector<std::pair<uint64, OfflineUser>> g_mOfflineUsers;
 
-SH_DECL_HOOK6(IServerGameClients, ClientConnect, SH_NOATTRIB, 0, bool, CPlayerSlot, const char*, uint64, const char *, bool, CBufferString *);
-SH_DECL_HOOK5_void(IServerGameClients, ClientDisconnect, SH_NOATTRIB, 0, CPlayerSlot, ENetworkDisconnectionReason, const char *, uint64, const char *);
 
 bool containsOnlyDigits(const std::string& str) {
 	return str.find_first_not_of("0123456789") == std::string::npos;
@@ -142,7 +140,9 @@ void OnReloadPunish(const CCommandContext& context, const CCommand& args)
     {
         CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
         if(!pPlayer) continue;
-        if(g_pPlayers->GetSteamID64(i) == std::stoull(args[1]))
+		uint32 m_steamID = pPlayer->m_steamID();
+		if(m_steamID == 0) continue;
+        if((containsOnlyDigits(args[1]) && m_steamID == std::stoll(args[1])) || (containsOnlyDigits(args[1]) && std::stoll(args[1]) == i) || (containsOnlyDigits(args[1]) && std::stoll(args[1]) == engine->GetClientXUID(i)))
         {
             bFound = true;
             iSlot = i;
@@ -178,7 +178,9 @@ void OnReloadAdmin(const CCommandContext& context, const CCommand& args)
     {
         CCSPlayerController* pPlayer = CCSPlayerController::FromSlot(i);
         if(!pPlayer) continue;
-        if(g_pPlayers->GetSteamID64(i) == std::stoull(args[1]))
+		uint32 m_steamID = pPlayer->m_steamID();
+		if(m_steamID == 0) continue;
+        if((containsOnlyDigits(args[1]) && m_steamID == std::stoll(args[1])) || (containsOnlyDigits(args[1]) && std::stoll(args[1]) == i) || (containsOnlyDigits(args[1]) && std::stoll(args[1]) == engine->GetClientXUID(i)))
         {
             bFound = true;
             iSlot = i;
@@ -389,6 +391,11 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 	std::string szReason = args.ArgS();
     std::string arg1 = args[1];
     std::string arg2 = args[2];
+	std::string name;
+	if(args.ArgC() > 4) {
+		name = args[args.ArgC()-1];
+		szReason.erase(szReason.find(name), name.length());
+	}
 	bool bFound = false;
 	int iSlot = 0;
 	for (int i = 0; i < 64; i++)
@@ -463,7 +470,7 @@ void TotalCommand(int iAdmin, int iType, const char* szFlag, const CCommand& arg
 		}
 		else
 		{
-			TryAddOfflinePunishment(strdup(args[1]), "undefined", iType, iTime, szReason, iAdmin);
+			TryAddOfflinePunishment(strdup(args[1]), name.length() > 0 ? name.c_str() : "undefined", iType, iTime, szReason, iAdmin);
 			if(bConsole) {
 				if(iAdmin == -1) META_CONPRINT("[Admin System] Player punished\n");
 				else g_pUtils->PrintToConsole(iAdmin, "[Admin System] Player punished\n");
@@ -541,11 +548,6 @@ void PunishCommand(const CCommandContext& context, const CCommand& args)
 		return;
 	}
 	TotalCommand(iAdmin, iType, szFlag, args, true, false);
-}
-
-CGameEntitySystem* GameEntitySystem()
-{
-	return g_pUtils->GetCGameEntitySystem();
 }
 
 void StartupServer()
@@ -634,9 +636,8 @@ bool admin_system::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen, 
 	GET_V_IFACE_CURRENT(GetEngineFactory, engine, IVEngineServer2, SOURCE2ENGINETOSERVER_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, g_pFullFileSystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, g_pSource2GameClients, IServerGameClients, SOURCE2GAMECLIENTS_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetEngineFactory, g_pGameResourceServiceServer, IGameResourceService, GAMERESOURCESERVICESERVER_INTERFACE_VERSION);
 	
-	SH_ADD_HOOK_MEMFUNC(IServerGameClients, ClientConnect, g_pSource2GameClients, this, &admin_system::OnClientConnect, false );
-	SH_ADD_HOOK(IServerGameClients, ClientDisconnect, g_pSource2GameClients, SH_MEMBER(this, &admin_system::OnClientDisconnect), true);
 
 	g_SMAPI->AddListener( this, this );
 	
@@ -662,8 +663,7 @@ void* admin_system::OnMetamodQuery(const char* iface, int* ret)
 
 bool admin_system::Unload(char *error, size_t maxlen)
 {
-	SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientConnect, g_pSource2GameClients, this, &admin_system::OnClientConnect, false);
-	SH_REMOVE_HOOK(IServerGameClients, ClientDisconnect, g_pSource2GameClients, SH_MEMBER(this, &admin_system::OnClientDisconnect), true);
+	if(g_pUtils) g_pUtils->ClearAllHooks(g_PLID);
 	ConVar_Unregister();
 	
 	return true;
@@ -677,7 +677,7 @@ bool admin_system::OnClientConnect(CPlayerSlot slot, const char *pszName, uint64
 		ResetPunishments(iSlot);
 		CheckPunishments(iSlot, xuid);
 	}
-	RETURN_META_VALUE(MRES_IGNORED, true);
+	return true;
 }
 
 void LoadSorting()
@@ -959,6 +959,7 @@ bool OnChatPre(int iSlot, const char* szContent, bool bTeam)
 
 void OnClientAuthorized(int iSlot, uint64 xuid)
 {
+	Msg("[AS] Client authorized: %s(%d) - %llu\n", engine->GetClientConVarValue(iSlot, "name"), iSlot, xuid);
 	auto it = std::find_if(g_mOfflineUsers.begin(), g_mOfflineUsers.end(), [xuid](const std::pair<uint64, OfflineUser>& p) {
         return p.first == xuid;
     });
@@ -1026,6 +1027,7 @@ void admin_system::AllPluginsLoaded()
 		engine->ServerCommand(sBuffer.c_str());
 		return;
 	}
+	g_pPlayers->AddListener(g_PLID, this);
 	ISQLInterface* g_SqlInterface = (ISQLInterface *)g_SMAPI->MetaFactory(SQLMM_INTERFACE, &ret, nullptr);
 	if (ret == META_IFACE_FAILED) {
 		g_pUtils->ErrorLog("[%s] Missing MYSQL plugin", g_PLAPI->GetLogTag());
@@ -1049,7 +1051,7 @@ void admin_system::AllPluginsLoaded()
 	g_pUtils->StartupServer(g_PLID, StartupServer);
 	g_pUtils->HookIsHearingClient(g_PLID, OnHearingClient);
 	g_pUtils->AddChatListenerPre(g_PLID, OnChatPre);
-	g_pPlayers->HookOnClientAuthorized(g_PLID, OnClientAuthorized);
+	g_pPlayers->HookOnClientAuthorized(g_PLID, ::OnClientAuthorized);
 
 	if(g_bStaticNames)
 	{
@@ -1617,7 +1619,7 @@ const char* admin_system::GetLicense()
 
 const char* admin_system::GetVersion()
 {
-	return "1.0.8";
+	return "1.0.8f";
 }
 
 const char* admin_system::GetDate()
@@ -1648,4 +1650,16 @@ const char* admin_system::GetName()
 const char* admin_system::GetURL()
 {
 	return "https://discord.gg/g798xERK5Y";
+}
+
+// utils listener overrides (were SourceHook hooks)
+bool admin_system::ClientConnect(int iSlot)
+{
+	return OnClientConnect(CPlayerSlot(iSlot), g_pPlayers->GetPlayerName(iSlot), engine->GetClientXUID(CPlayerSlot(iSlot)), g_pPlayers->GetIpAddress(iSlot), false, nullptr);
+}
+
+void admin_system::ClientDisconnect(int iSlot)
+{
+	// utils calls this before the player is released, so name/xuid are still valid
+	OnClientDisconnect(CPlayerSlot(iSlot), ENetworkDisconnectionReason(0), g_pPlayers->GetPlayerName(iSlot), engine->GetClientXUID(CPlayerSlot(iSlot)), g_pPlayers->GetIpAddress(iSlot));
 }

@@ -27,6 +27,13 @@ typedef std::function<void(int iSlot, const char* szAction, const char* szParam)
 typedef std::function<bool(int iSlot, int iType, int iTime, const char* szReason, int iAdminID)> OnPlayerPunishCallbackPre;
 typedef std::function<bool(const char* szSteamID64, const char* szName, int iType, int iTime, const char* szReason, int iAdminID)> OnOfflinePlayerPunishCallbackPre;
 
+// Пункт админ меню (категория или элемент) для построения своего меню
+struct AdminMenuEntry
+{
+    std::string szIdentity; // идентификатор категории/элемента
+    std::string szName;     // переведённое название (с учётом display-колбэков)
+};
+
 #define Admin_INTERFACE "IAdminApi"
 
 class IAdminApi
@@ -82,4 +89,9 @@ public:
     virtual int GetAdminGroupID(int iSlot) = 0;
     virtual const char* GetAdminGroupName(int iSlot) = 0;
     virtual int GetImmunityType() = 0;
+
+    // Категории админ меню, доступные игроку, в том же порядке, что и в !admin
+    virtual std::vector<AdminMenuEntry> GetAdminMenuCategories(int iSlot) = 0;
+    // Элементы категории, доступные игроку. Выбор элемента - ShowAdminItemMenu(iSlot, szCategory, szIdentity)
+    virtual std::vector<AdminMenuEntry> GetAdminMenuItems(int iSlot, const char* szCategory) = 0;
 };

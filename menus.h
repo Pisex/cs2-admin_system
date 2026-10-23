@@ -39,6 +39,8 @@ bool OnAdminMenu(int iSlot, const char* szContent);
 void ShowItemMenu(int iSlot, const char* szCategory, const char* szIdentity);
 void ShowCategoryMenu(int iSlot, const char* szCategory);
 void ShowLastCategoryMenu(int iSlot);
+std::vector<AdminMenuEntry> CollectCategories(int iSlot);
+std::vector<AdminMenuEntry> CollectCategoryItems(int iSlot, const char* szCategory);
 void ShowPunishMenu(int iSlot, int iType);
 void ShowUnPunishMenu(int iSlot, int iType);
 void ShowTimesMenu(int iSlot, uint64 iTarget, int iType, std::string szReason, bool bOffline);

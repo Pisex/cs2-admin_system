@@ -12,7 +12,7 @@
 #include <deque>
 #include <functional>
 #include <utlstring.h>
-#include <KeyValues.h>
+#include <keyvalues.h>
 #include "CCSPlayerController.h"
 #include "include/menus.h"
 #include "include/mysql_mm.h"
@@ -152,6 +152,14 @@ public:
 	void ShowAdminCategoryMenu(int iSlot, const char* szCategory);
 	void ShowAdminLastCategoryMenu(int iSlot);
 	void ShowAdminItemMenu(int iSlot, const char* szCategory, const char* szIdentity);
+	std::vector<AdminMenuEntry> GetAdminMenuCategories(int iSlot) override {
+		if (iSlot < 0 || iSlot >= 64) return {};
+		return CollectCategories(iSlot);
+	}
+	std::vector<AdminMenuEntry> GetAdminMenuItems(int iSlot, const char* szCategory) override {
+		if (iSlot < 0 || iSlot >= 64 || !szCategory) return {};
+		return CollectCategoryItems(iSlot, szCategory);
+	}
 	void AddPlayerAdmin(const char* szName, const char* szSteamID64, const char* szFlags, int iImmunity, int iExpireTime, int iGroupID, const char* szComment, bool bDB);
 	void RemovePlayerAdmin(const char* szSteamID64, bool bDB);
 	void AddPlayerLocalFlag(int iSlot, const char* szFlag);
@@ -210,9 +218,11 @@ private:
 	bool m_bCoreLoaded = false;
 };
 
-class admin_system final : public ISmmPlugin, public IMetamodListener
+class admin_system final : public ISmmPlugin, public IMetamodListener, public IPlayerListener
 {
 public:
+	bool ClientConnect(int iSlot) override;
+	void ClientDisconnect(int iSlot) override;
 	bool Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen, bool late);
 	bool Unload(char* error, size_t maxlen);
 	void AllPluginsLoaded();
