@@ -1,15 +1,20 @@
-name: Build AMBuild Plugin
+name: Build
 
 on:
   push:
     branches:
       - main
+    tags:
+      - '*'
   pull_request:
     branches:
       - main
-  release:
-    types:
-      - created
+  workflow_dispatch:
+
+env:
+  HL2SDK_COMMIT: 5f891c9026230cce0fc0a3fc4b5fef1c467a1385
+  MMS_COMMIT: c47debe129df84c0e54d7393347d2a6afa3b9ee5
+  SCHEMAENTITY_COMMIT: e7965b3c83ec684d44584ee6457c5482ee5d9db1
 
 jobs:
   build:
@@ -20,57 +25,73 @@ jobs:
     container:
       image: ghcr.io/pisex/ubuntu20:latest
 
-    env:
-      HL2SDK_ROOT: "${{ github.workspace }}/external"
-      MMS_PATH: "${{ github.workspace }}/external/metamod-source"
-      MANIFEST_PATH: "${{ github.workspace }}/external/metamod-source/hl2sdk-manifests"
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up dependencies
+      - name: Install tools
         run: |
           export DEBIAN_FRONTEND=noninteractive
           apt-get update -qy
-          apt-get install -y git clang-10 clang++-10 binutils python3 python3-pip zip
-
+          apt-get install -y git clang-10 binutils python3 python3-pip zip
           python3 -m pip install --upgrade pip importlib-metadata
           python3 -m pip install setuptools==45.2.0
-          
-          git clone https://github.com/alliedmodders/ambuild.git ambuild
-          cd ambuild
-          pip3 install .
-          cd ..
+          git clone --depth 1 https://github.com/alliedmodders/ambuild.git /tmp/ambuild
+          python3 -m pip install /tmp/ambuild
 
-          mkdir -p external
-          cd external
+      - name: Fetch dependencies
+        run: |
+          fetch() {
+            git init -q "$2"
+            git -C "$2" remote add origin "$1"
+            git -C "$2" fetch -q --depth 1 origin "$3"
+            git -C "$2" checkout -q FETCH_HEAD
+          }
+          EXT="$GITHUB_WORKSPACE/external"
+          SAMPLES="$(dirname "$(dirname "$GITHUB_WORKSPACE")")/samples"
+          mkdir -p "$EXT" "$SAMPLES"
 
-          git clone --recursive --branch master --single-branch \
-            https://github.com/alliedmodders/metamod-source.git
-          git clone --recursive --branch cs2 --single-branch \
-            https://github.com/alliedmodders/hl2sdk.git hl2sdk-cs2
+          fetch https://github.com/alliedmodders/hl2sdk.git "$EXT/hl2sdk-cs2" "$HL2SDK_COMMIT"
+          sed -i 's/^.*virtual void\s*MakeSpawnGroupActive(.*$/&\n\tvirtual bool\tIsSpawnGroupLoadedForClient( CPlayerSlot nSlot, SpawnGroupHandle_t spawnGroup ) = 0;/' "$EXT/hl2sdk-cs2/public/eiface.h"
+          grep -q IsSpawnGroupLoadedForClient "$EXT/hl2sdk-cs2/public/eiface.h"
 
-          cd ../../..
-          mkdir samples
-          cd samples
-          git clone https://github.com/pisex/SchemaEntity.git
-          
-      - name: Configure and build plugin
+          fetch https://github.com/alliedmodders/metamod-source.git "$EXT/metamod-source" "$MMS_COMMIT"
+          git -C "$EXT/metamod-source" submodule update -q --init --recursive --depth 1
+          test -d "$EXT/metamod-source/third_party/khook/include"
+
+          fetch https://github.com/Pisex/SchemaEntity.git "$SAMPLES/SchemaEntity" "$SCHEMAENTITY_COMMIT"
+          cd "$SAMPLES/SchemaEntity"
+          sed -i 's/FL_CONTROLLER_FAKECLIENT/FL_FAKECLIENT/' CCSPlayerController.h
+          sed -i 's/FL_PAWN_FAKECLIENT/FL_FAKECLIENT/' CCSPlayerPawn.h
+          sed -i 's/NetworkStateChanged_t/NetworkStateChangedData/g' schemasystem.cpp
+          sed -i 's/^\(\s*\)SCHEMA_FIELD(int, m_iDefaultClip1)$/&\n\1SCHEMA_FIELD(bool, m_bReserveAmmoAsClips)/' CCSWeaponBase.h
+          sed -i 's/^\(\s*\)virtual void unk_17() = 0;$/&\n\1virtual void unk_18() = 0;\n\1virtual void unk_19() = 0;\n\1virtual void unk_20() = 0;\n\1virtual void unk_21() = 0;\n\1virtual void unk_22() = 0;/' services.h
+          grep -q unk_22 services.h
+          grep -q m_bReserveAmmoAsClips CCSWeaponBase.h
+
+      - name: Build
         run: |
           mkdir build
           cd build
-          python3 ../configure.py -s cs2 --targets x86_64 --enable-optimize --hl2sdk-manifests=./hl2sdk-manifests --mms_path=$MMS_PATH --hl2sdk-root=$HL2SDK_ROOT
+          CC=clang-10 CXX=clang++-10 python3 ../configure.py --sdks cs2 --targets x86_64 --enable-optimize \
+            --mms_path "$GITHUB_WORKSPACE/external/metamod-source" \
+            --hl2sdk-root "$GITHUB_WORKSPACE/external" \
+            --hl2sdk-manifests "$GITHUB_WORKSPACE/hl2sdk-manifests"
           ambuild
 
-      - name: Package addon into ZIP
+      - name: Package
         run: |
-          cd build/package/addons
-          zip -r "${{ github.event.repository.name }}.zip" .
-          mv "${{ github.event.repository.name }}.zip" "${GITHUB_WORKSPACE}/"
-          
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+          cd build/package
+          zip -r "$GITHUB_WORKSPACE/${{ github.event.repository.name }}.zip" addons
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ github.event.head_commit.message }}
-          files: ${{ github.workspace }}/${{ github.event.repository.name }}.zip
+          name: ${{ github.event.repository.name }}
+          path: build/package/addons
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.event.repository.name }}.zip
